@@ -1,36 +1,50 @@
+# Imports e configuração básica
 import os
 import requests
 import logging
 import random
 import gzip
 from datetime import datetime, timedelta
-from typing import Dict, Any
+from typing import Dict, Any, List
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, after_this_request
 from flask_caching import Cache
+from flask_sqlalchemy import SQLAlchemy
 
 # Configuração do logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Inicialização do Flask e configurações
 app = Flask(__name__)
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a secret key")
+app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 app.static_folder = 'static'
 
 # Configuração do cache
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
-    'CACHE_DEFAULT_TIMEOUT': 600  # Aumentado para 10 minutos
+    'CACHE_DEFAULT_TIMEOUT': 600
 })
 
-# Configurações do SQLAlchemy para otimizar conexões
+# Configuração do SQLAlchemy
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 50,  # Aumentado número máximo de conexões permanentes
-    "max_overflow": 25,  # Aumentado número máximo de conexões temporárias
-    "pool_timeout": 60,  # Aumentado tempo máximo de espera por uma conexão
-    "pool_recycle": 1800,  # Recicla conexões após 30 minutos
-    "pool_pre_ping": True,  # Verifica conexões antes de usar
+    "pool_size": 50,
+    "max_overflow": 25,
+    "pool_timeout": 60,
+    "pool_recycle": 1800,
+    "pool_pre_ping": True,
 }
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
+# Inicialização do SQLAlchemy
+db = SQLAlchemy(app)
+
+# Importa os modelos após a inicialização do db
+from models import Usuario, Pagamento  # noqa
+
+# Cria as tabelas no banco de dados
+with app.app_context():
+    db.create_all()
 
 # Middleware de compressão
 def gzip_response(response):
@@ -149,21 +163,19 @@ def gerar_nomes_falsos(nome_real: str) -> list:
     random.shuffle(todos_nomes)
     return todos_nomes
 
-def gerar_datas_falsas(data_real: str) -> list:
-    data_real = datetime.strptime(data_real.split()[0], '%Y-%m-%d')
+# Função auxiliar para gerar datas falsas
+def gerar_datas_falsas(data_real_str: str) -> List[str]:
+    data_real = datetime.strptime(data_real_str.split()[0], '%Y-%m-%d')
     datas_falsas = []
 
-    # Gera duas datas falsas próximas à data real
     for _ in range(2):
-        dias = random.randint(-365*2, 365*2)  # ±2 anos
+        dias = random.randint(-365*2, 365*2)
         data_falsa = data_real + timedelta(days=dias)
         datas_falsas.append(data_falsa)
 
-    # Adiciona a data real e embaralha
     todas_datas = datas_falsas + [data_real]
     random.shuffle(todas_datas)
 
-    # Formata as datas no padrão brasileiro
     return [data.strftime('%d/%m/%Y') for data in todas_datas]
 
 @app.route('/consultar_cpf', methods=['POST'])
