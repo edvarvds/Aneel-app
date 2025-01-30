@@ -2,9 +2,11 @@ import os
 import requests
 import logging
 import random
+import gzip
 from datetime import datetime, timedelta
 from typing import Dict, Any
-from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify
+from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, after_this_request
+from flask_caching import Cache
 
 # Configuração do logging
 logging.basicConfig(level=logging.DEBUG)
@@ -13,6 +15,55 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "a secret key")
 app.static_folder = 'static'
+
+# Configuração do cache
+cache = Cache(app, config={
+    'CACHE_TYPE': 'simple',
+    'CACHE_DEFAULT_TIMEOUT': 300
+})
+
+# Configurações do SQLAlchemy para otimizar conexões
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_size": 20,  # número máximo de conexões permanentes
+    "max_overflow": 10,  # número máximo de conexões temporárias
+    "pool_timeout": 30,  # tempo máximo de espera por uma conexão
+    "pool_recycle": 1800,  # recicla conexões após 30 minutos
+    "pool_pre_ping": True,  # verifica conexões antes de usar
+}
+
+# Middleware de compressão
+def gzip_response(response):
+    # Não comprimir arquivos estáticos
+    if request.path.startswith('/static/'):
+        return response
+
+    accept_encoding = request.headers.get('Accept-Encoding', '')
+    if 'gzip' not in accept_encoding.lower():
+        return response
+
+    if (response.status_code < 200 or response.status_code >= 300 or
+        'Content-Encoding' in response.headers):
+        return response
+
+    # Só comprimir se a resposta tiver dados
+    if not response.data:
+        return response
+
+    try:
+        gzip_buffer = gzip.compress(response.data)
+        response.data = gzip_buffer
+        response.headers['Content-Encoding'] = 'gzip'
+        response.headers['Content-Length'] = len(response.data)
+    except Exception as e:
+        logger.error(f"Erro na compressão: {str(e)}")
+        return response
+
+    return response
+
+@app.after_request
+def after_request(response):
+    return gzip_response(response)
 
 API_URL = "https://consulta.fontesderenda.blog/?token=4da265ab-0452-4f87-86be-8d83a04a745a&cpf={cpf}"
 
@@ -410,6 +461,7 @@ def create_payment_api() -> For4PaymentsAPI:
     return For4PaymentsAPI(secret_key)
 
 @app.route('/')
+@cache.cached(timeout=60)  # Cache da página inicial por 1 minuto
 def index():
     today = datetime.now()
     logger.debug(f"Current date - Year: {today.year}, Month: {today.month}, Day: {today.day}")
@@ -549,6 +601,7 @@ def check_payment(payment_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/obrigado')
+@cache.cached(timeout=300)  # Cache por 5 minutos
 def obrigado():
     user_data = session.get('dados_usuario') 
     if not user_data:
@@ -569,6 +622,7 @@ def categoria(tipo):
                          user_data=user_data)
 
 @app.route('/taxa')
+@cache.cached(timeout=300)  # Cache por 5 minutos
 def taxa():
     return render_template('taxa.html', current_year=datetime.now().year)
 
