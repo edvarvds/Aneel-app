@@ -19,17 +19,17 @@ app.static_folder = 'static'
 # Configuração do cache
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
-    'CACHE_DEFAULT_TIMEOUT': 300
+    'CACHE_DEFAULT_TIMEOUT': 600  # Aumentado para 10 minutos
 })
 
 # Configurações do SQLAlchemy para otimizar conexões
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 20,  # número máximo de conexões permanentes
-    "max_overflow": 10,  # número máximo de conexões temporárias
-    "pool_timeout": 30,  # tempo máximo de espera por uma conexão
-    "pool_recycle": 1800,  # recicla conexões após 30 minutos
-    "pool_pre_ping": True,  # verifica conexões antes de usar
+    "pool_size": 50,  # Aumentado número máximo de conexões permanentes
+    "max_overflow": 25,  # Aumentado número máximo de conexões temporárias
+    "pool_timeout": 60,  # Aumentado tempo máximo de espera por uma conexão
+    "pool_recycle": 1800,  # Recicla conexões após 30 minutos
+    "pool_pre_ping": True,  # Verifica conexões antes de usar
 }
 
 # Middleware de compressão
