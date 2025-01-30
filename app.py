@@ -26,14 +26,19 @@ cache = Cache(app, config={
 })
 
 # Configuração do SQLAlchemy
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_size": 50,
-    "max_overflow": 25,
-    "pool_timeout": 60,
-    "pool_recycle": 1800,
-    "pool_pre_ping": True,
-}
+database_url = os.environ.get("DATABASE_URL")
+if database_url:
+    # Use connection pooler for better performance
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url.replace('.us-east-2', '-pooler.us-east-2')
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_size": 20,
+        "max_overflow": 10,
+        "pool_timeout": 30,
+        "pool_recycle": 1800,
+        "pool_pre_ping": True,
+    }
+else:
+    raise ValueError("DATABASE_URL environment variable is not set")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Inicialização do SQLAlchemy
