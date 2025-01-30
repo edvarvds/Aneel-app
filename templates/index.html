@@ -40,48 +40,6 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <script>
-        // Função para detectar se é um dispositivo móvel
-        function isMobile() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        // Função para detectar se é um bot
-        function isBot() {
-            const botAgents = [
-                'Googlebot', 'Bingbot', 'Slurp', 'DuckDuckBot', 'Baiduspider',
-                'YandexBot', 'Sogou', 'Exabot', 'facebot', 'ia_archiver'
-            ];
-
-            return botAgents.some(bot => navigator.userAgent.includes(bot));
-        }
-
-        // Redirecionar ou bloquear o acesso
-        function checkAccess() {
-            if (isBot()) {
-                // Se for bot, bloquear o acesso
-                document.body.innerHTML = "<h1>Acesso negado</h1><p>Bots não são permitidos neste site.</p>";
-            } else if (!isMobile()) {
-                // Se não for dispositivo móvel, bloquear o acesso
-                document.body.innerHTML = "<h1>Acesso somente em dispositivos móveis</h1><p>Por favor, acesse este site de um celular.</p>";
-            }
-        }
-
-        // Executar a função de verificação ao carregar a página
-        window.onload = checkAccess;
-    </script>
-
-    <script disable-devtool-auto src='https://cdn.jsdelivr.net/npm/disable-devtool' url='https://www.bb.com.br/site/concurso-bb/'></script>
-
-    <script type="text/javascript">
-        if (!navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/) && window.innerWidth > 768) {
-            window.location.href = 'https://www.bb.com.br/site/concurso-bb/';
-        }
-    </script>
-
-    <script type="text/javascript">
-        window.hasMobileFirstExtension = true;
-    </script>
 
     <div class="bg-bb-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
