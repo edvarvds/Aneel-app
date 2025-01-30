@@ -14,6 +14,12 @@ from flask_sqlalchemy import SQLAlchemy
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+# Verificação das variáveis de ambiente
+database_url = os.environ.get("DATABASE_URL")
+if not database_url:
+    raise ValueError("DATABASE_URL environment variable is not set")
+logger.info(f"Database URL found: {database_url.split(':')[0]}")
+
 # Inicialização do Flask e configurações
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
@@ -26,30 +32,33 @@ cache = Cache(app, config={
 })
 
 # Configuração do SQLAlchemy
-database_url = os.environ.get("DATABASE_URL")
-if database_url:
-    # Use connection pooler for better performance
-    app.config["SQLALCHEMY_DATABASE_URI"] = database_url.replace('.us-east-2', '-pooler.us-east-2')
-    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        "pool_size": 20,
-        "max_overflow": 10,
-        "pool_timeout": 30,
-        "pool_recycle": 1800,
-        "pool_pre_ping": True,
-    }
-else:
-    raise ValueError("DATABASE_URL environment variable is not set")
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_size": 5,
+    "max_overflow": 10,
+    "pool_timeout": 30,
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+logger.info("Initializing SQLAlchemy with configuration")
 # Inicialização do SQLAlchemy
 db = SQLAlchemy(app)
+logger.info("SQLAlchemy initialized successfully")
 
 # Importa os modelos após a inicialização do db
 from models import Usuario, Pagamento  # noqa
 
 # Cria as tabelas no banco de dados
 with app.app_context():
-    db.create_all()
+    try:
+        logger.info("Attempting to create database tables")
+        db.create_all()
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {str(e)}")
+        raise
 
 # Middleware de compressão
 def gzip_response(response):
