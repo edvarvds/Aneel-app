@@ -13,4 +13,5 @@ dependencies = [
     "requests>=2.32.3",
     "trafilatura>=2.0.0",
     "gevent>=24.11.1",
+    "flask-migrate>=4.1.0",
 ]

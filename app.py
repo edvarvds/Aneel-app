@@ -9,6 +9,7 @@ from typing import Dict, Any, List
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, after_this_request
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 # Configuração do logging
 logging.basicConfig(level=logging.DEBUG)
@@ -43,9 +44,10 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 logger.info("Initializing SQLAlchemy with configuration")
-# Inicialização do SQLAlchemy
+# Inicialização do SQLAlchemy e Flask-Migrate
 db = SQLAlchemy(app)
-logger.info("SQLAlchemy initialized successfully")
+migrate = Migrate(app, db)
+logger.info("SQLAlchemy and Flask-Migrate initialized successfully")
 
 # Importa os modelos após a inicialização do db
 from models import Usuario, Pagamento  # noqa
