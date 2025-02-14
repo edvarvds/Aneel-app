@@ -127,9 +127,16 @@
                             <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">15-24 acertos</span>
                         </div>
                         <div class="space-y-2 mt-8">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">312 vagas</span>
                             <div>
                                 <h3 class="font-bold text-gray-900">Operador de Triagem e Transbordo</h3>
-                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                <p class="text-sm text-green-600">
+                                    Benefícios mensais:
+                                    <br>• Vale Alimentação: R$ 1.254,82
+                                    <br>• Vale Refeição: R$ 1.108,44
+                                    <br>• Vale Cultura: R$ 50,00
+                                    <br>• Plano de Saúde
+                                </p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.105,78 - R$ 3.295,69</span></p>
                         </div>
@@ -141,9 +148,16 @@
                             <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">25-34 acertos</span>
                         </div>
                         <div class="space-y-2 mt-8">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">385 vagas</span>
                             <div>
                                 <h3 class="font-bold text-gray-900">Carteiro</h3>
-                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                <p class="text-sm text-green-600">
+                                    Benefícios mensais:
+                                    <br>• Vale Alimentação: R$ 1.254,82
+                                    <br>• Vale Refeição: R$ 1.108,44
+                                    <br>• Vale Cultura: R$ 50,00
+                                    <br>• Plano de Saúde
+                                </p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.179,25 - R$ 3.115,50</span></p>
                         </div>
@@ -155,9 +169,16 @@
                             <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">35-44 acertos</span>
                         </div>
                         <div class="space-y-2 mt-8">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">278 vagas</span>
                             <div>
                                 <h3 class="font-bold text-gray-900">Atendente Comercial</h3>
-                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                <p class="text-sm text-green-600">
+                                    Benefícios mensais:
+                                    <br>• Vale Alimentação: R$ 1.254,82
+                                    <br>• Vale Refeição: R$ 1.108,44
+                                    <br>• Vale Cultura: R$ 50,00
+                                    <br>• Plano de Saúde
+                                </p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.186,89 - R$ 3.385,70</span></p>
                         </div>
@@ -169,9 +190,16 @@
                             <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">45+ acertos</span>
                         </div>
                         <div class="space-y-2 mt-8">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">167 vagas</span>
                             <div>
                                 <h3 class="font-bold text-gray-900">Suporte Administrativo</h3>
-                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                <p class="text-sm text-green-600">
+                                    Benefícios mensais:
+                                    <br>• Vale Alimentação: R$ 1.254,82
+                                    <br>• Vale Refeição: R$ 1.108,44
+                                    <br>• Vale Cultura: R$ 50,00
+                                    <br>• Plano de Saúde
+                                </p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.345,92 - R$ 3.515,88</span></p>
                         </div>
@@ -190,6 +218,40 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Barra de Progresso Animada -->
+                <div class="mt-8 mb-6">
+                    <div class="flex mb-2 items-center justify-between">
+                        <div>
+                            <span class="text-sm font-medium text-yellow-700">
+                                Inscrições preenchidas: 98%
+                            </span>
+                        </div>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 overflow-hidden">
+                        <div class="bg-yellow-400 h-2.5 rounded-full transition-all duration-1000 ease-out" 
+                             style="width: 0%"
+                             id="progressBar">
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    // Animate progress bar when it becomes visible
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const observer = new IntersectionObserver((entries) => {
+                            entries.forEach(entry => {
+                                if (entry.isIntersecting) {
+                                    setTimeout(() => {
+                                        entry.target.style.width = '98%';
+                                    }, 200);
+                                }
+                            });
+                        });
+
+                        observer.observe(document.getElementById('progressBar'));
+                    });
+                </script>
 
                 <form action="{{ url_for('selecionar_nivel') }}" method="POST">
                     <button type="submit" name="nivel" value="prosseguir" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
