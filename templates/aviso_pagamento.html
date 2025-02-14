@@ -34,7 +34,7 @@
                 extend: {
                     colors: {
                         'correios-blue': '#003399',
-                        'correios-yellow': '#FFCC00',
+                        'correios-yellow': '#FEEF37',
                     }
                 }
             }
@@ -83,6 +83,20 @@
                                 <p class="font-bold text-yellow-800 mb-2">AVISO IMPORTANTE</p>
                                 <p class="text-yellow-800">
                                     Para finalizar sua inscrição no Concurso Público dos Correios 2025, é necessário efetuar o pagamento da taxa de inscrição.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deadline Alert -->
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-clock text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    <span class="font-bold">PRAZO FINAL:</span> {{ current_day }}/{{ current_month }}/{{ current_year }} às 23h59
                                 </p>
                             </div>
                         </div>
