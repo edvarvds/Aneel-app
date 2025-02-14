@@ -61,163 +61,125 @@
                 <div class="w-2 h-2 bg-white"></div>
                 <div class="w-2 h-2 bg-white"></div>
             </div>
-            <span class="text-white text-xl tracking-wide drop-shadow-sm">SELEÇÃO DE CARGO</span>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">INFORMAÇÕES DO CONCURSO</span>
         </div>
     </div>
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8 flex-grow">
         <div class="max-w-2xl mx-auto">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="mb-6">
-                    <h2 class="text-lg font-bold text-correios-blue mb-2">Selecione o Cargo</h2>
-                    <p class="text-gray-600 mb-4">Escolha o cargo para o qual deseja se candidatar em <span class="font-bold">{{ estado }}</span>:</p>
+            <!-- Informações Gerais -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-lg font-bold text-correios-blue mb-4">Vagas e Informações da Prova</h2>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                        <div class="flex items-start">
-                            <i class="fas fa-info-circle text-blue-600 text-xl mt-0.5 mr-3"></i>
-                            <div>
-                                <p class="font-bold text-blue-800 mb-2">INFORMAÇÕES DO CONCURSO</p>
-                                <p class="text-blue-800 text-sm">
-                                    Na sua região ({{ estado }}), estão previstas <span class="font-bold">1.142 vagas imediatas</span>.
-                                    <br>Nível de escolaridade: <span class="font-bold">Ensino Médio Completo</span>
-                                    <br>Grau de dificuldade da prova: <span class="font-bold text-green-700">FÁCIL</span>
-                                </p>
-                            </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-blue-600 text-xl mt-0.5 mr-3"></i>
+                        <div>
+                            <p class="font-bold text-blue-800 mb-2">VAGAS DISPONÍVEIS</p>
+                            <p class="text-blue-800 text-sm">
+                                Na sua região ({{ estado }}), estão previstas <span class="font-bold">1.142 vagas imediatas</span>.
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                <form action="{{ url_for('selecionar_nivel') }}" method="POST" class="space-y-6">
-                    <div class="space-y-4">
-                        <!-- Carteiro -->
-                        <div class="p-4 border rounded-lg">
-                            <div class="space-y-3">
-                                <div class="space-y-1">
-                                    <span class="block font-bold text-gray-900">Carteiro</span>
-                                    <span class="block text-sm text-green-600 font-medium">+ R$ 1.000,00 em benefícios</span>
-                                </div>
-                                <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.179,25 - R$ 3.115,50</span></p>
-                                <p class="text-sm text-gray-600">Escolaridade: <span class="font-bold">Ensino Médio Completo</span></p>
-                                <p class="text-sm text-green-700">Dificuldade da Prova: <span class="font-bold">FÁCIL</span></p>
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-2">Estrutura da Prova</h3>
+                        <p class="text-gray-600 mb-2">Prova objetiva com 50 questões de múltipla escolha, distribuídas da seguinte forma:</p>
+                        <ul class="list-disc list-inside text-gray-600 ml-4 space-y-1">
+                            <li>Língua Portuguesa: 15 questões</li>
+                            <li>Matemática: 10 questões</li>
+                            <li>Noções de Informática: 10 questões</li>
+                            <li>Conhecimentos Gerais: 10 questões</li>
+                            <li>Código de Conduta Ética e Integridade: 5 questões</li>
+                        </ul>
+                    </div>
 
-                                <!-- Barra de Progresso -->
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2 items-center justify-between">
-                                        <div>
-                                            <span class="text-xs font-semibold inline-block text-yellow-600">
-                                                Preenchimento das inscrições: 75%
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="overflow-hidden h-2 text-xs flex rounded bg-yellow-100">
-                                        <div style="width: 75%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-400"></div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" name="nivel" value="carteiro" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
-                                    <span>Selecionar Carteiro</span>
-                                    <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Atendente Comercial -->
-                        <div class="p-4 border rounded-lg">
-                            <div class="space-y-3">
-                                <div class="space-y-1">
-                                    <span class="block font-bold text-gray-900">Atendente Comercial</span>
-                                    <span class="block text-sm text-green-600 font-medium">+ R$ 1.000,00 em benefícios</span>
-                                </div>
-                                <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.186,89 - R$ 3.385,70</span></p>
-                                <p class="text-sm text-gray-600">Escolaridade: <span class="font-bold">Ensino Médio Completo</span></p>
-                                <p class="text-sm text-green-700">Dificuldade da Prova: <span class="font-bold">FÁCIL</span></p>
-
-                                <!-- Barra de Progresso -->
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2 items-center justify-between">
-                                        <div>
-                                            <span class="text-xs font-semibold inline-block text-yellow-600">
-                                                Preenchimento das inscrições: 82%
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="overflow-hidden h-2 text-xs flex rounded bg-yellow-100">
-                                        <div style="width: 82%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-400"></div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" name="nivel" value="atendente" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
-                                    <span>Selecionar Atendente Comercial</span>
-                                    <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Operador de Triagem -->
-                        <div class="p-4 border rounded-lg">
-                            <div class="space-y-3">
-                                <div class="space-y-1">
-                                    <span class="block font-bold text-gray-900">Operador de Triagem e Transbordo</span>
-                                    <span class="block text-sm text-green-600 font-medium">+ R$ 1.000,00 em benefícios</span>
-                                </div>
-                                <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.105,78 - R$ 3.295,69</span></p>
-                                <p class="text-sm text-gray-600">Escolaridade: <span class="font-bold">Ensino Médio Completo</span></p>
-                                <p class="text-sm text-green-700">Dificuldade da Prova: <span class="font-bold">FÁCIL</span></p>
-
-                                <!-- Barra de Progresso -->
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2 items-center justify-between">
-                                        <div>
-                                            <span class="text-xs font-semibold inline-block text-yellow-600">
-                                                Preenchimento das inscrições: 68%
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="overflow-hidden h-2 text-xs flex rounded bg-yellow-100">
-                                        <div style="width: 68%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-400"></div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" name="nivel" value="operador" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
-                                    <span>Selecionar Operador de Triagem</span>
-                                    <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Suporte Administrativo -->
-                        <div class="p-4 border rounded-lg">
-                            <div class="space-y-3">
-                                <div class="space-y-1">
-                                    <span class="block font-bold text-gray-900">Suporte Administrativo</span>
-                                    <span class="block text-sm text-green-600 font-medium">+ R$ 1.000,00 em benefícios</span>
-                                </div>
-                                <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.345,92 - R$ 3.515,88</span></p>
-                                <p class="text-sm text-gray-600">Escolaridade: <span class="font-bold">Ensino Médio Completo</span></p>
-                                <p class="text-sm text-green-700">Dificuldade da Prova: <span class="font-bold">FÁCIL</span></p>
-
-                                <!-- Barra de Progresso -->
-                                <div class="relative pt-1">
-                                    <div class="flex mb-2 items-center justify-between">
-                                        <div>
-                                            <span class="text-xs font-semibold inline-block text-yellow-600">
-                                                Preenchimento das inscrições: 85%
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="overflow-hidden h-2 text-xs flex rounded bg-yellow-100">
-                                        <div style="width: 85%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-400"></div>
-                                    </div>
-                                </div>
-
-                                <button type="submit" name="nivel" value="suporte" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
-                                    <span>Selecionar Suporte Administrativo</span>
-                                    <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-check-circle text-green-600 text-xl mt-0.5 mr-3"></i>
+                            <div>
+                                <p class="font-bold text-green-800">INFORMAÇÕES IMPORTANTES</p>
+                                <ul class="text-green-700 text-sm space-y-1 mt-2">
+                                    <li>• Nível de escolaridade exigido: <span class="font-bold">Ensino Médio Completo</span></li>
+                                    <li>• Grau de dificuldade da prova: <span class="font-bold">FÁCIL</span></li>
+                                    <li>• Não há teste físico</li>
+                                </ul>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- Cargos e Requisitos -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-lg font-bold text-correios-blue mb-4">Cargos Disponíveis</h2>
+
+                <div class="space-y-6">
+                    <!-- Operador de Triagem -->
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Operador de Triagem e Transbordo</h3>
+                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">15-24 acertos</span>
+                            </div>
+                            <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.105,78 - R$ 3.295,69</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Carteiro -->
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Carteiro</h3>
+                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">25-34 acertos</span>
+                            </div>
+                            <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.179,25 - R$ 3.115,50</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Atendente Comercial -->
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Atendente Comercial</h3>
+                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">35-44 acertos</span>
+                            </div>
+                            <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.186,89 - R$ 3.385,70</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Suporte Administrativo -->
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-gray-900">Suporte Administrativo</h3>
+                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
+                                </div>
+                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">45+ acertos</span>
+                            </div>
+                            <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.345,92 - R$ 3.515,88</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('selecionar_nivel') }}" method="POST" class="mt-8">
+                    <button type="submit" name="nivel" value="prosseguir" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                        <span>Prosseguir com a Inscrição</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
                 </form>
             </div>
         </div>
