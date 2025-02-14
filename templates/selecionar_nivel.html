@@ -20,6 +20,9 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        .clip-path-badge {
+            clip-path: polygon(10% 0%, 100% 0%, 100% 100%, 0% 100%);
+        }
     </style>
     <script>
         tailwind.config = {
@@ -119,63 +122,76 @@
 
                 <div class="space-y-6">
                     <!-- Operador de Triagem -->
-                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-gray-900">Operador de Triagem e Transbordo</h3>
-                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
-                                </div>
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">15-24 acertos</span>
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors relative">
+                        <div class="absolute -right-0 top-0">
+                            <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">15-24 acertos</span>
+                        </div>
+                        <div class="space-y-2 mt-8">
+                            <div>
+                                <h3 class="font-bold text-gray-900">Operador de Triagem e Transbordo</h3>
+                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.105,78 - R$ 3.295,69</span></p>
                         </div>
                     </div>
 
                     <!-- Carteiro -->
-                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-gray-900">Carteiro</h3>
-                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
-                                </div>
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">25-34 acertos</span>
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors relative">
+                        <div class="absolute -right-0 top-0">
+                            <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">25-34 acertos</span>
+                        </div>
+                        <div class="space-y-2 mt-8">
+                            <div>
+                                <h3 class="font-bold text-gray-900">Carteiro</h3>
+                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.179,25 - R$ 3.115,50</span></p>
                         </div>
                     </div>
 
                     <!-- Atendente Comercial -->
-                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-gray-900">Atendente Comercial</h3>
-                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
-                                </div>
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">35-44 acertos</span>
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors relative">
+                        <div class="absolute -right-0 top-0">
+                            <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">35-44 acertos</span>
+                        </div>
+                        <div class="space-y-2 mt-8">
+                            <div>
+                                <h3 class="font-bold text-gray-900">Atendente Comercial</h3>
+                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.186,89 - R$ 3.385,70</span></p>
                         </div>
                     </div>
 
                     <!-- Suporte Administrativo -->
-                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h3 class="font-bold text-gray-900">Suporte Administrativo</h3>
-                                    <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
-                                </div>
-                                <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">45+ acertos</span>
+                    <div class="p-4 border rounded-lg hover:bg-gray-50 transition-colors relative">
+                        <div class="absolute -right-0 top-0">
+                            <span class="inline-flex whitespace-nowrap bg-yellow-100 text-yellow-800 text-xs font-medium px-3 py-1.5 rounded-l-lg clip-path-badge">45+ acertos</span>
+                        </div>
+                        <div class="space-y-2 mt-8">
+                            <div>
+                                <h3 class="font-bold text-gray-900">Suporte Administrativo</h3>
+                                <p class="text-sm text-green-600">+ R$ 1.000,00 em benefícios</p>
                             </div>
                             <p class="text-sm text-gray-700">Salário: <span class="font-bold">R$ 2.345,92 - R$ 3.515,88</span></p>
                         </div>
                     </div>
                 </div>
 
-                <form action="{{ url_for('selecionar_nivel') }}" method="POST" class="mt-8">
+                <!-- Novo Disclaimer -->
+                <div class="mt-8 mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-circle text-blue-600 text-xl mt-0.5 mr-3"></i>
+                        <div>
+                            <p class="font-bold text-blue-800 mb-2">NOVO PROCESSO DE SELEÇÃO!</p>
+                            <p class="text-blue-700 text-sm">
+                                O Concurso dos Correios 2025 traz uma novidade: após a divulgação do resultado, você poderá escolher o cargo desejado de acordo com sua pontuação na prova. Quanto mais acertos, mais opções de cargos estarão disponíveis para sua escolha!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('selecionar_nivel') }}" method="POST">
                     <button type="submit" name="nivel" value="prosseguir" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
                         <span>Prosseguir com a Inscrição</span>
                         <i class="fas fa-arrow-right ml-2"></i>
