@@ -31,7 +31,7 @@ task = "packager.installForAll"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "gunicorn -c gunicorn_config.py main:app"
+args = "python main.py"
 waitForPort = 5000
 
 [[ports]]
