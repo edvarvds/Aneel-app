@@ -369,7 +369,9 @@ def verificar_endereco():
                                   'email': dados_usuario['email'],
                                   'phone': dados_usuario['phone'],
                                   'cpf': dados_usuario['cpf']},
-                            current_year=datetime.now().year)
+                            current_year=datetime.now().year,
+                            current_month=str(datetime.now().month).zfill(2),
+                            current_day=str(datetime.now().day).zfill(2))
 
     # GET request - mostra o formulário
     return render_template('verificar_endereco.html',
