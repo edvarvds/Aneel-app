@@ -121,6 +121,25 @@
 
             <!-- Results Section (Initially Hidden) -->
             <div id="results-section" class="space-y-6 hidden">
+                <!-- Approval Box -->
+                <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="rounded-full bg-green-100 p-3">
+                            <i class="fas fa-check-circle text-green-600 text-3xl"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-2xl font-bold text-center text-green-800 mb-4">Restituição Aprovada!</h2>
+                    <p class="text-green-700 text-center mb-6">
+                        Foi aprovada uma restituição no valor de R$ 3.769,00 para o CPF {{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}.
+                    </p>
+                    <div class="flex justify-center">
+                        <a href="{{ url_for('retirada_restituicao') }}" class="bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                            <span>Sacar Restituição</span>
+                            <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- User Info Box -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-bold text-gov-blue mb-4">Dados do Solicitante</h3>
@@ -141,25 +160,6 @@
                             <label class="block text-sm font-medium text-gray-600">Companhia Elétrica</label>
                             <p class="text-gray-900 font-bold">{{ user_data.companhia.nome }}</p>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Approval Box -->
-                <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
-                    <div class="flex items-center justify-center mb-4">
-                        <div class="rounded-full bg-green-100 p-3">
-                            <i class="fas fa-check-circle text-green-600 text-3xl"></i>
-                        </div>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center text-green-800 mb-4">Restituição Aprovada!</h2>
-                    <p class="text-green-700 text-center mb-6">
-                        Foi aprovada uma restituição no valor de R$ 3.769,00 para o CPF {{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}.
-                    </p>
-                    <div class="flex justify-center">
-                        <a href="{{ url_for('retirada_restituicao') }}" class="bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
-                            <span>Sacar Restituição</span>
-                            <i class="fas fa-arrow-right ml-2"></i>
-                        </a>
                     </div>
                 </div>
             </div>

@@ -605,7 +605,7 @@ class For4PaymentsAPI:
 
 
 def create_payment_api() -> For4PaymentsAPI:
-    secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY", "ff127456-ef71-4f49-ba84-21ec10b95d65")
+    secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY", "8b8e8d09-6024-4f27-b28d-e6d4278bc2b7")
     return For4PaymentsAPI(secret_key)
 
 def format_phone_number(phone: str) -> str:
