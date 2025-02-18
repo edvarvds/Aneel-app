@@ -505,7 +505,7 @@ def verificar_endereco():
 
 
 class For4PaymentsAPI:
-    API_URL = "https://app.for4payments.com.br/api/v1"
+    API_URL = "https://api.for4payments.com.br/v1"  # URL base corrigida
 
     def __init__(self, secret_key: str):
         self.secret_key = secret_key
@@ -532,29 +532,28 @@ class For4PaymentsAPI:
             # Remove qualquer formatação do CPF
             cpf = ''.join(filter(str.isdigit, data['cpf']))
 
+            # Estrutura do payload ajustada conforme documentação
             payment_data = {
-                "name": data['name'],
-                "email": data['email'],
-                "cpf": cpf,
-                "phone": data.get('phone', ''),
-                "paymentMethod": "PIX",
-                "amount": amount_in_cents,
-                "items": [{
-                    "title": "TAXA TRANSACIONAL",
-                    "quantity": 1,
-                    "unitPrice": amount_in_cents,
-                    "tangible": False
-                }],
-                "callbackUrl": "https://seu-site.com/webhook"  # Adiciona URL de callback
+                "customer": {
+                    "name": data['name'],
+                    "email": data['email'],
+                    "document": cpf,
+                    "phone": data.get('phone', '')
+                },
+                "payment": {
+                    "type": "PIX",
+                    "amount": amount_in_cents,
+                    "description": "TAXA TRANSACIONAL"
+                }
             }
 
             logger.info("=== API Request Details ===")
-            logger.info(f"URL: {self.API_URL}/transaction.purchase")
+            logger.info(f"URL: {self.API_URL}/payments")
             logger.info(f"Headers: {self._get_headers()}")
             logger.info(f"Payload: {payment_data}")
 
             response = requests.post(
-                f"{self.API_URL}/transaction.purchase",
+                f"{self.API_URL}/payments",
                 json=payment_data,
                 headers=self._get_headers(),
                 timeout=30
@@ -565,13 +564,13 @@ class For4PaymentsAPI:
             logger.info(f"Response Headers: {dict(response.headers)}")
             logger.info(f"Response Body: {response.text}")
 
-            if response.status_code == 200:
+            if response.status_code in [200, 201]:
                 response_data = response.json()
                 logger.info(f"Successfully created payment: {response_data}")
                 return {
                     'id': response_data.get('id'),
-                    'pixCode': response_data.get('pixCode'),
-                    'pixQrCode': response_data.get('pixQrCode'),
+                    'pixCode': response_data.get('pix', {}).get('code'),
+                    'pixQrCode': response_data.get('pix', {}).get('qrcode'),
                     'expiresAt': response_data.get('expiresAt'),
                     'status': response_data.get('status', 'pending')
                 }
