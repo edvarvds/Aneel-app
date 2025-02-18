@@ -570,13 +570,53 @@ def pagamento():
 
 @app.route('/check_payment/<payment_id>')
 def check_payment(payment_id):
+    """Endpoint to check payment status"""
     try:
         payment_api = create_payment_api()
         status_data = payment_api.check_payment_status(payment_id)
+        logger.info(f"Payment status check for {payment_id}: {status_data}")
+
+        if status_data['status'] in ['COMPLETED', 'APPROVED', 'PAID']:
+            # Update payment status in database if found
+            try:
+                pagamento = Pagamento.query.filter_by(payment_id=payment_id).first()
+                if pagamento:
+                    pagamento.status = 'aprovado'
+                    db.session.commit()
+                    logger.info(f"Payment {payment_id} status updated to approved in database")
+            except Exception as e:
+                logger.error(f"Error updating payment status in database: {str(e)}")
+
         return jsonify(status_data)
     except Exception as e:
         logger.error(f"Error checking payment status: {str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500
+
+@app.route('/confirmacao_pagamento/<payment_id>')
+def confirmacao_pagamento(payment_id):
+    """Rota para a página de confirmação após pagamento bem-sucedido"""
+    try:
+        # Buscar informações do pagamento no banco de dados
+        pagamento = Pagamento.query.filter_by(payment_id=payment_id).first()
+
+        if not pagamento:
+            logger.warning(f"Payment {payment_id} not found in database")
+            flash('Pagamento não encontrado.')
+            return redirect(url_for('index'))
+
+        # Formatando os dados para exibição
+        payment_date = pagamento.data_criacao.strftime('%d/%m/%Y %H:%M:%S')
+        amount = "{:.2f}".format(float(pagamento.valor))
+
+        return render_template('confirmacao_pagamento.html',
+                           payment_id=payment_id,
+                           payment_date=payment_date,
+                           amount=amount,
+                           current_year=datetime.now().year)
+    except Exception as e:
+        logger.error(f"Erro ao carregar página de confirmação: {str(e)}")
+        flash('Erro ao carregar confirmação. Por favor, tente novamente.')
+        return redirect(url_for('index'))
 
 @app.route('/')
 @cache.cached(timeout=60)  # Cache da página inicial por 1 minuto
@@ -757,7 +797,7 @@ def verificar_taxa():
                 return redirect(url_for('taxa'))
         else:
             flash('CPF não encontrado ou dados incompletos.')
-            returnredirect(url_for('taxa'))
+            return redirect(url_for('taxa'))
 
     except Exception as e:
         logger.error(f"Erro na consulta: {str(e)}")
@@ -812,31 +852,6 @@ def generate_random_email() -> str:
     """
     random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=8))
     return f"{random_string}@temp-mail.org"
-
-@app.route('/confirmacao_pagamento/<payment_id>')
-def confirmacao_pagamento(payment_id):
-    """Rota para a página de confirmação após pagamento bem-sucedido"""
-    try:
-        # Buscar informações do pagamento no banco de dados
-        pagamento = Pagamento.query.filter_by(payment_id=payment_id).first()
-
-        if not pagamento:
-            flash('Pagamento não encontrado.')
-            return redirect(url_for('index'))
-
-        # Formatando os dados para exibição
-        payment_date = pagamento.data_criacao.strftime('%d/%m/%Y %H:%M:%S')
-        amount = "{:.2f}".format(float(pagamento.valor))
-
-        return render_template('confirmacao_pagamento.html',
-                           payment_id=payment_id,
-                           payment_date=payment_date,
-                           amount=amount,
-                           current_year=datetime.now().year)
-    except Exception as e:
-        logger.error(f"Erro ao carregar página de confirmação: {str(e)}")
-        flash('Erro ao carregar confirmação. Por favor, tente novamente.')
-        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
