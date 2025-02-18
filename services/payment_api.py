@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 class For4PaymentsAPI:
 
     def __init__(self, secret_key: str = None):
-        self.API_URL = "https://app.for4payments.com.br/api/v1"
+        self.API_URL = "https://app.for4payments.com.br/api/v1/"  # Fixed: Added trailing slash
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
@@ -25,7 +25,7 @@ class For4PaymentsAPI:
 
     def _get_headers(self) -> Dict[str, str]:
         return {
-            'Authorization': self.secret_key,
+            'Authorization': f"Bearer {self.secret_key}",  # Fixed: Added Bearer prefix
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -50,8 +50,14 @@ class For4PaymentsAPI:
         logger.info("Headers:")
         logger.info(pprint.pformat(safe_headers, indent=2))
 
+        # Log request body with sensitive data masked
+        safe_request = {
+            **request_data,
+            'cpf': f"{request_data.get('cpf', '')[:3]}****{request_data.get('cpf', '')[-2:]}" if 'cpf' in request_data else None,
+            'phone': f"****{request_data.get('phone', '')[-4:]}" if 'phone' in request_data else None
+        }
         logger.info("Request Body:")
-        logger.info(pprint.pformat(request_data, indent=2))
+        logger.info(pprint.pformat(safe_request, indent=2))
 
         # Log Response
         logger.info(f"\n{'='*80}\n[For4Payments][{transaction_id}] RESPONSE DETAILS\n{'='*80}")
@@ -60,28 +66,20 @@ class For4PaymentsAPI:
         logger.info(pprint.pformat(dict(response.headers), indent=2))
 
         try:
-            response_body = response.json()
-            logger.info("Response Body:")
-            logger.info(pprint.pformat(response_body, indent=2))
-        except Exception as e:
+            response_text = response.text
             logger.info("Raw Response Body:")
-            logger.info(response.text)
-            logger.error(f"Error parsing response as JSON: {str(e)}")
+            logger.info(response_text)
+
+            if response.headers.get('content-type', '').startswith('application/json'):
+                response_body = response.json()
+                logger.info("Parsed JSON Response:")
+                logger.info(pprint.pformat(response_body, indent=2))
+        except Exception as e:
+            logger.error(f"Error processing response: {str(e)}")
 
         logger.info(f"{'='*80}\n")
 
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Create a new PIX payment
-
-        Args:
-            data (dict): Payment data containing:
-                - amount (float): Payment amount
-                - name (str): Customer name
-                - email (str): Customer email
-                - cpf (str): Customer CPF
-                - phone (str): Customer phone
-        """
         transaction_id = str(uuid.uuid4())
         try:
             logger.info(f"\n[For4Payments][{transaction_id}] Starting new payment transaction")
@@ -136,7 +134,7 @@ class For4PaymentsAPI:
                 'id': result['id'],
                 'pixCode': result['pixCode'],
                 'pixQrCode': result['pixQrCode'],
-                'expiresAt': result['expiresAt'],
+                'expiresAt': result.get('expiresAt'),
                 'status': result.get('status', 'pending')
             }
 

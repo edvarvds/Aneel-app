@@ -1,0 +1,42 @@
+INFO:services.payment_api:
+================================================================================
+[For4Payments][bb74c993-04b9-4e18-ae5f-d6d319ba76fd] REQUEST DETAILS
+================================================================================
+INFO:services.payment_api:Method: POST
+INFO:services.payment_api:URL: https://app.for4payments.com.br/api/transaction.purchase
+INFO:services.payment_api:Headers:
+INFO:services.payment_api:{'Accept': 'application/json', 'Content-Type': 'application/json'}
+INFO:services.payment_api:Request Body:
+INFO:services.payment_api:{ 'amount': 7840,
+  'cpf': '06088233508',
+  'email': 'companyblack@proton.me',
+  'items': [ { 'quantity': 1,
+               'tangible': False,
+               'title': 'tarifa transacional',
+               'unitPrice': 7840}],
+  'name': 'LUCRECIO FREITAS NOVAIS NETO',
+  'paymentMethod': 'PIX',
+  'phone': '5561998262761'}
+INFO:services.payment_api:
+================================================================================
+[For4Payments][bb74c993-04b9-4e18-ae5f-d6d319ba76fd] RESPONSE DETAILS
+================================================================================
+INFO:services.payment_api:Status Code: 404
+INFO:services.payment_api:Response Headers:
+INFO:services.payment_api:{ 'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+  'Content-Encoding': 'gzip',
+  'Content-Type': 'text/html; charset=utf-8',
+  'Date': 'Tue, 18 Feb 2025 03:53:29 GMT',
+  'Link': '</_next/static/media/83001f47a8fdbd0d-s.p.woff2>; rel=preload; '
+          'as="font"; crossorigin=""; type="font/woff2", '
+          '</_next/static/media/a34f9d1faa5f3315-s.p.woff2>; rel=preload; '
+          'as="font"; crossorigin=""; type="font/woff2"',
+  'Server': 'Vercel',
+  'Strict-Transport-Security': 'max-age=63072000',
+  'Transfer-Encoding': 'chunked',
+  'Vary': 'RSC, Next-Router-State-Tree, Next-Router-Prefetch',
+  'X-Matched-Path': '/404',
+  'X-Powered-By': 'Next.js',
+  'X-Vercel-Cache': 'MISS',
+  'X-Vercel-Id': 'sfo1::iad1::lndvc-1739850809157-18aefe63dc8e'}
+INFO:services.payment_api:Raw Response Body:
