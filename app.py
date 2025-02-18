@@ -775,7 +775,7 @@ def obrigado():
             value=114.10,  # Value of Correios registration
             currency='BRL',
             content_type='product',
-            transaction_id=user_data.get('cpf', ''),  # Using CPF as transaction ID
+            transaction_id=user_data.get('cpf', ''),  # UsingCPF as transaction ID
             user_data=user_info
         )
 
@@ -890,18 +890,9 @@ def pagamento_taxa():
                            error=f"Error generating payment: {str(e)}",
                            current_year=datetime.now().year)
 
-def generate_random_phone() -> str:
-    """
-    Generates a random phone number in the Brazilian format accepted by the API
-    """
-    ddd = str(random.randint(11, 99))
-    # Generates 8 digits for the number (without the 9 in front)
-    numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
-    return f"{ddd}{numero}"  
-
 def generate_random_email() -> str:
     """
-    Generates a random email for cases where the user did not provide
+    Generates a random email for cases where the user did not provide one
     """
     random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=8))
     return f"{random_string}@temp-mail.org"
