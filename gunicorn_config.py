@@ -1,8 +1,8 @@
 import multiprocessing
 import os
 
-# Número de workers baseado no número de cores
-workers = multiprocessing.cpu_count() * 4 + 1
+# Número de workers baseado no número de cores, com limite máximo
+workers = min(multiprocessing.cpu_count() * 2 + 1, 6)  # Máximo de 6 workers
 
 # Tempo limite de resposta em segundos
 timeout = 120
