@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class For4PaymentsAPI:
 
     def __init__(self, secret_key: str = None):
-        self.API_URL = "https://app.for4payments.com.br/api/"  # Removed v1 as per error logs
+        self.API_URL = "https://app.for4payments.com.br/api"  # Fixed base URL
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
@@ -28,7 +28,7 @@ class For4PaymentsAPI:
         """Get headers with proper authorization"""
         return {
             'Accept': 'application/json',
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         }
 
     def _format_phone(self, phone: str) -> str:
@@ -110,15 +110,19 @@ class For4PaymentsAPI:
                 }]
             }
 
-            url = urljoin(self.API_URL, 'transaction.purchase')  # Changed back to dot notation
+            url = f"{self.API_URL}/transaction.purchase"  # Fixed endpoint URL
             headers = self._get_headers()
 
-            # Make the request
+            logger.info(f"Making request to URL: {url}")
+            logger.info(f"Request headers: {headers}")
+            logger.info(f"Request data: {payment_data}")
+
+            # Make the request with token as query parameter
             response = requests.post(
                 url,
                 headers=headers,
                 json=payment_data,
-                params={'token': self.secret_key}  # Added token as query parameter
+                params={'token': self.secret_key}  # Add token as query parameter
             )
 
             # Log complete request and response details
@@ -153,10 +157,17 @@ class For4PaymentsAPI:
         """Check the status of a payment"""
         transaction_id = str(uuid.uuid4())
         try:
-            url = urljoin(self.API_URL, 'transaction.getPayment')
+            url = f"{self.API_URL}/transaction.getPayment"
             headers = self._get_headers()
 
-            response = requests.get(url, headers=headers, params={'id': payment_id})
+            response = requests.get(
+                url, 
+                headers=headers, 
+                params={
+                    'id': payment_id,
+                    'token': self.secret_key
+                }
+            )
 
             # Log complete request and response details
             self._log_request_response(
