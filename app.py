@@ -524,14 +524,15 @@ def pagamento():
         if not user_data:
             flash('Sessão expirada. Por favor, faça a consulta novamente.')
             return render_template('pagamento.html',
-                               error="Sessão expirada",
-                               pix_data={},
-                               current_year=datetime.now().year)
+                                error="Sessão expirada",
+                                pix_data={},
+                                valor_total="78,40",
+                                current_year=datetime.now().year)
 
         payment_api = create_payment_api()
 
         # Formata o telefone adequadamente
-        phone = format_phone_number(user_data.get('telefone', ''))
+        phone = format_phone_number(user_data.get('phone', ''))
 
         # Garante que temos um email válido
         email = user_data.get('email', '')
@@ -557,22 +558,25 @@ def pagamento():
                 raise ValueError("Falha ao gerar dados do PIX")
 
             return render_template('pagamento.html',
-                               pix_data=pix_data,
-                               valor_total="78,40",
-                               current_year=datetime.now().year)
+                                pix_data=pix_data,
+                                valor_total="78,40",
+                                current_year=datetime.now().year)
+
         except Exception as e:
             logger.error(f"Erro específico na criação do PIX: {str(e)}")
             return render_template('pagamento.html',
-                               error=f"Erro ao gerar PIX: {str(e)}",
-                               pix_data={},
-                               current_year=datetime.now().year)
+                                error=str(e),
+                                pix_data={},
+                                valor_total="78,40",
+                                current_year=datetime.now().year)
 
     except Exception as e:
         logger.error(f"Erro geral na rota de pagamento: {str(e)}")
         return render_template('pagamento.html',
-                           error=f"Erro ao processar pagamento: {str(e)}",
-                           pix_data={},
-                           current_year=datetime.now().year)
+                            error=str(e),
+                            pix_data={},
+                            valor_total="78,40",
+                            current_year=datetime.now().year)
 
 @app.route('/check_payment/<payment_id>')
 def check_payment(payment_id):
@@ -760,7 +764,7 @@ def verificar_taxa():
                 payment_data = {
                     'name': dados['name'],
                     'email': dados['email'],
-                    'cpf': dados['cpf'],
+                    'cpf':dados['cpf'],
                     'phone': dados['phone'],
                     'amount': 82.10
                 }
