@@ -14,4 +14,5 @@ dependencies = [
     "trafilatura>=2.0.0",
     "gevent>=24.11.1",
     "flask-migrate>=4.1.0",
+    "twilio>=9.4.5",
 ]

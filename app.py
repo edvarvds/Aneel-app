@@ -608,6 +608,23 @@ def create_payment_api() -> For4PaymentsAPI:
     secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY", "ff127456-ef71-4f49-ba84-21ec10b95d65")
     return For4PaymentsAPI(secret_key)
 
+def format_phone_number(phone: str) -> str:
+    """
+    Formata o número de telefone para o padrão aceito pela API (apenas dígitos, começando com 55)
+    """
+    # Remove todos os caracteres não numéricos
+    phone = ''.join(filter(str.isdigit, phone))
+
+    # Se não começar com 55 (código do Brasil), adiciona
+    if not phone.startswith('55'):
+        phone = '55' + phone
+
+    # Garante que tenha pelo menos 10 dígitos após o código do país
+    if len(phone) < 12:  # 55 + 10 dígitos
+        return None
+
+    return phone
+
 @app.route('/pagamento', methods=['GET', 'POST'])
 def pagamento():
     user_data = session.get('dados_usuario') 
@@ -617,11 +634,18 @@ def pagamento():
 
     try:
         payment_api = create_payment_api()
+
+        # Formata o telefone adequadamente
+        phone = format_phone_number(user_data.get('telefone', ''))
+        if not phone:
+            # Se não houver telefone válido, gera um número aleatório
+            phone = generate_random_phone()
+
         payment_data = {
             'name': user_data['nome_real'], 
             'email': user_data.get('email', ''), 
             'cpf': user_data['cpf'],
-            'phone': user_data.get('telefone', ''), 
+            'phone': phone,
             'amount': 78.40  # Valor da tarifa transacional
         }
 
@@ -763,7 +787,7 @@ def obrigado():
 def categoria(tipo):
     user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessãoexpirada. Por favor, faça a consulta novamente.')
+        flash('Sessão expirada. Por favor, faça a consulta novamente.')
         return redirect(url_for('index'))
     return render_template(f'categoria_{tipo}.html', 
                          current_year=datetime.now().year,
@@ -858,8 +882,20 @@ def pagamento_taxa():
 def generate_random_email():
     return f"user_{random.randint(1,1000)}@example.com"
 
-def generate_random_phone():
-    return f"55119{random.randint(10000000,99999999)}"
+def generate_random_phone() -> str:
+    """
+    Gera um número de telefone aleatório no formato brasileiro
+    """
+    ddd = str(random.randint(11, 99))
+    numero = ''.join([str(random.randint(0, 9)) for _ in range(9)])
+    return f"55{ddd}{numero}"
+
+def generate_random_email() -> str:
+    """
+    Gera um email aleatório para casos onde o usuário não forneceu
+    """
+    random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=8))
+    return f"{random_string}@temp-mail.org"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
