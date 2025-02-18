@@ -371,6 +371,36 @@ def analise_dados():
                          user_data=user_data,
                          current_year=datetime.now().year)
 
+
+@app.route('/retirada_restituicao')
+def retirada_restituicao():
+    """Rota para a página de retirada da restituição"""
+    user_data = session.get('dados_usuario')
+    if not user_data:
+        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        return redirect(url_for('index'))
+
+    return render_template('retirada_restituicao.html',
+                         user_data=user_data,
+                         current_year=datetime.now().year)
+
+@app.route('/processar_retirada', methods=['POST'])
+def processar_retirada():
+    """Rota para processar a solicitação de retirada"""
+    user_data = session.get('dados_usuario')
+    if not user_data:
+        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        return redirect(url_for('index'))
+
+    confirma_dados = request.form.get('confirma_dados')
+    if not confirma_dados:
+        flash('É necessário confirmar os dados para prosseguir.')
+        return redirect(url_for('retirada_restituicao'))
+
+    return render_template('processando_retirada.html',
+                         user_data=user_data,
+                         current_year=datetime.now().year)
+
 @app.route('/selecionar_estado', methods=['POST'])
 def selecionar_estado():
     estado = request.form.get('estado')

