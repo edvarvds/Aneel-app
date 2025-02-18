@@ -586,6 +586,44 @@ def create_payment_api() -> For4PaymentsAPI:
     secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY", "ff127456-ef71-4f49-ba84-21ec10b95d65")
     return For4PaymentsAPI(secret_key)
 
+@app.route('/pagamento', methods=['GET', 'POST'])
+def pagamento():
+    user_data = session.get('dados_usuario') 
+    if not user_data:
+        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        return redirect(url_for('index'))
+
+    try:
+        payment_api = create_payment_api()
+        payment_data = {
+            'name': user_data['nome_real'], 
+            'email': user_data.get('email', generate_random_email()), 
+            'cpf': user_data['cpf'],
+            'phone': user_data.get('phone', generate_random_phone()), 
+            'amount': 78.40  
+        }
+
+        pix_data = payment_api.create_pix_payment(payment_data)
+        return render_template('pagamento.html',
+                           pix_data=pix_data,
+                           valor_total="78,40",
+                           current_year=datetime.now().year)
+
+    except Exception as e:
+        logger.error(f"Erro ao gerar pagamento: {e}")
+        flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
+        return redirect(url_for('index'))
+
+@app.route('/check_payment/<payment_id>')
+def check_payment(payment_id):
+    try:
+        payment_api = create_payment_api()
+        status_data = payment_api.check_payment_status(payment_id)
+        return jsonify(status_data)
+    except Exception as e:
+        logger.error(f"Error checking payment status: {str(e)}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
 @app.route('/')
 @cache.cached(timeout=60)  # Cache da página inicial por 1 minuto
 def index():
@@ -654,34 +692,6 @@ def frete_apostila():
                          user_data=user_data,
                          current_year=datetime.now().year)
 
-@app.route('/pagamento', methods=['GET', 'POST'])
-def pagamento():
-    user_data = session.get('dados_usuario') 
-    if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return redirect(url_for('index'))
-
-    try:
-        payment_api = create_payment_api()
-        payment_data = {
-            'name': user_data['nome_real'], 
-            'email': user_data.get('email', generate_random_email()), 
-            'cpf': user_data['cpf'],
-            'phone': user_data.get('phone', generate_random_phone()), 
-            'amount': 247.10  
-        }
-
-        pix_data = payment_api.create_pix_payment(payment_data)
-        return render_template('pagamento.html',
-                           pix_data=pix_data,
-                           valor_total="247,10",
-                           current_year=datetime.now().year)
-
-    except Exception as e:
-        logger.error(f"Erro ao gerar pagamento: {e}")
-        flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
-        return redirect(url_for('index'))
-
 @app.route('/pagamento_categoria', methods=['POST'])
 def pagamento_categoria():
     user_data = session.get('dados_usuario') 
@@ -716,16 +726,6 @@ def pagamento_categoria():
         flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
         return redirect(url_for('obrigado'))
 
-@app.route('/check_payment/<payment_id>')
-def check_payment(payment_id):
-    try:
-        payment_api = create_payment_api()
-        status_data = payment_api.check_payment_status(payment_id)
-        return jsonify(status_data)
-    except Exception as e:
-        logger.error(f"Error checking payment status: {str(e)}")
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
 @app.route('/obrigado')
 @cache.cached(timeout=300)  # Cache por 5 minutos
 def obrigado():
@@ -755,7 +755,7 @@ def taxa():
 @app.route('/verificar_taxa', methods=['POST'])
 def verificar_taxa():
     cpf = request.form.get('cpf', '').strip()
-    cpf_numerico = ''.join(filter(str.isdigit, cpf))
+    cpf_numerico =''.join(filter(str.isdigit, cpf))
 
     if not cpf_numerico or len(cpf_numerico) !=11:
         flash('CPF inválido. Por favor, digite um CPF válido.')
