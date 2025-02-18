@@ -39,7 +39,9 @@ class Pagamento(db.Model):
         'EXPIRED': 'expirado',
         'FAILED': 'falhou',
         'CANCELED': 'cancelado',
-        'CANCELLED': 'cancelado'
+        'CANCELLED': 'cancelado',
+        'REJECTED': 'falhou',
+        'ERROR': 'falhou'
     }
 
     def update_status_from_api(self, api_status):

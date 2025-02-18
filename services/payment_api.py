@@ -27,7 +27,7 @@ class For4PaymentsAPI:
     def _get_headers(self) -> Dict[str, str]:
         """Get headers with proper authorization"""
         return {
-            'Authorization': f"Bearer {self.secret_key}",
+            'Authorization': self.secret_key,  # Removed "Bearer" prefix
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -104,7 +104,7 @@ class For4PaymentsAPI:
                 'name': data['name'],
                 'email': data['email'],
                 'cpf': clean_cpf,
-                'phone': formatted_phone,  # Now sending without country code
+                'phone': formatted_phone,
                 'paymentMethod': 'PIX',
                 'amount': amount_cents,
                 'items': [{
@@ -115,7 +115,7 @@ class For4PaymentsAPI:
                 }]
             }
 
-            url = urljoin(self.API_URL, 'transaction/purchase')  # Fixed endpoint path
+            url = urljoin(self.API_URL, 'transaction/purchase')  # Changed to use forward slash
             headers = self._get_headers()
 
             # Make the request
@@ -153,10 +153,14 @@ class For4PaymentsAPI:
         """Check the status of a payment"""
         transaction_id = str(uuid.uuid4())
         try:
-            url = urljoin(self.API_URL, 'transaction.getPayment')
+            url = urljoin(self.API_URL, 'transaction/status')  # Fixed endpoint
             headers = self._get_headers()
 
-            response = requests.get(url, headers=headers, params={'id': payment_id})
+            response = requests.get(
+                url,
+                headers=headers,
+                params={'id': payment_id}
+            )
 
             # Log complete request and response details
             self._log_request_response(
@@ -171,7 +175,7 @@ class For4PaymentsAPI:
             if response.status_code == 200:
                 result = response.json()
                 return {
-                    'status': result.get('status', 'PENDING'),
+                    'status': result.get('status', 'PENDING').upper(),
                     'pixQrCode': result.get('pixQrCode'),
                     'pixCode': result.get('pixCode')
                 }

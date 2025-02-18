@@ -199,8 +199,9 @@
             try {
                 const response = await fetch('/check_payment/{{ pix_data.id }}');
                 const data = await response.json();
+                console.log('Payment status response:', data); // Added logging
 
-                if (data.status === 'completed') {
+                if (data.status === 'COMPLETED' || data.status === 'APPROVED' || data.status === 'PAID') {
                     // Atualizar interface para mostrar sucesso
                     document.querySelector('.animate-spin').classList.remove('animate-spin');
                     document.querySelector('svg').style.display = 'none';
@@ -209,7 +210,7 @@
                     // Redirecionar instantaneamente
                     window.location.href = '/obrigado';
                     return;
-                } else if (data.status === 'failed' || data.status === 'cancelled') {
+                } else if (data.status === 'FAILED' || data.status === 'CANCELLED' || data.status === 'REJECTED' || data.status === 'ERROR') {
                     document.querySelector('.animate-spin').classList.remove('animate-spin');
                     document.querySelector('svg').style.display = 'none';
                     document.querySelector('h2').textContent = 'Pagamento Falhou';
