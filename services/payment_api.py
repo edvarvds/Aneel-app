@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import re
 from typing import Dict, Any
 from urllib.parse import urljoin
 import uuid
@@ -25,16 +26,24 @@ class For4PaymentsAPI:
 
     def _get_headers(self) -> Dict[str, str]:
         return {
-            'Authorization': f"Bearer {self.secret_key}",  # Fixed: Added Bearer prefix
+            'Authorization': f"Bearer {self.secret_key}",  
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
 
     def _format_phone(self, phone: str) -> str:
-        """Format phone number to match API requirements"""
+        """Format phone number to match API requirements (8-12 digits)"""
         # Remove all non-digits
         clean_phone = ''.join(filter(str.isdigit, phone))
-        logger.info(f"[Phone Formatting] Original: {phone} -> Formatted: {clean_phone}")
+
+        # Ensure it has country code
+        if not clean_phone.startswith('55'):
+            clean_phone = '55' + clean_phone
+
+        # Validate the phone number format (including country code)
+        if not re.match(r'^\d{8,12}$', clean_phone):
+            raise ValueError("Phone number must be between 8 and 12 digits")
+
         return clean_phone
 
     def _log_request_response(self, transaction_id: str, method: str, url: str, 
@@ -90,7 +99,7 @@ class For4PaymentsAPI:
             # Clean CPF
             clean_cpf = ''.join(filter(str.isdigit, data['cpf']))
 
-            # Format phone
+            # Format phone according to API requirements
             formatted_phone = self._format_phone(data['phone'])
 
             payment_data = {
