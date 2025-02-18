@@ -525,6 +525,7 @@ def pagamento():
             flash('Sessão expirada. Por favor, faça a consulta novamente.')
             return render_template('pagamento.html',
                                error="Sessão expirada",
+                               pix_data={},
                                current_year=datetime.now().year)
 
         payment_api = create_payment_api()
@@ -552,6 +553,9 @@ def pagamento():
             pix_data = payment_api.create_pix_payment(payment_data)
             logger.info(f"Resposta da API de pagamento: {pix_data}")
 
+            if not pix_data:
+                raise ValueError("Falha ao gerar dados do PIX")
+
             return render_template('pagamento.html',
                                pix_data=pix_data,
                                valor_total="78,40",
@@ -560,12 +564,14 @@ def pagamento():
             logger.error(f"Erro específico na criação do PIX: {str(e)}")
             return render_template('pagamento.html',
                                error=f"Erro ao gerar PIX: {str(e)}",
+                               pix_data={},
                                current_year=datetime.now().year)
 
     except Exception as e:
         logger.error(f"Erro geral na rota de pagamento: {str(e)}")
         return render_template('pagamento.html',
                            error=f"Erro ao processar pagamento: {str(e)}",
+                           pix_data={},
                            current_year=datetime.now().year)
 
 @app.route('/check_payment/<payment_id>')
