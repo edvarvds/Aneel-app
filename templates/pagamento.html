@@ -28,6 +28,16 @@
         }
     </style>
     <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gov-blue': '#003399',
+                    }
+                }
+            }
+        }
+
         async function checkPaymentStatus() {
             try {
                 {% if pix_data and pix_data.get('id') %}
@@ -36,12 +46,6 @@
 
                     if (data.status === 'completed') {
                         window.location.href = '/obrigado';
-                        return;
-                    } else if (data.status === 'failed' || data.status === 'cancelled') {
-                        // Atualizar a interface para mostrar falha
-                        document.querySelector('.animate-spin').classList.remove('animate-spin');
-                        document.querySelector('svg').style.display = 'none';
-                        document.querySelector('h2').textContent = 'Pagamento Falhou';
                         return;
                     }
 
@@ -72,9 +76,6 @@
                 copyButton.querySelector('span').textContent = originalText;
             }, 2000);
         }
-
-        // Start checking payment status
-        checkPaymentStatus();
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -182,5 +183,9 @@
         <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 
+    <script>
+        // Start checking payment status
+        checkPaymentStatus();
+    </script>
 </body>
 </html>

