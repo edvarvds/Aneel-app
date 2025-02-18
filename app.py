@@ -742,7 +742,8 @@ def obrigado():
         return redirect(url_for('index'))
     return render_template('obrigado.html', 
                          current_year=datetime.now().year,
-                         user_data=user_data)
+                         user_data=user_data,
+                         datetime=datetime)
 
 @app.route('/categoria/<tipo>')
 def categoria(tipo):
