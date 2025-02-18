@@ -29,7 +29,7 @@ class For4PaymentsAPI:
         return {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.secret_key}'
+             'Authorization': f'{self.secret_key}'
         }
 
     def _format_phone(self, phone: str) -> str:

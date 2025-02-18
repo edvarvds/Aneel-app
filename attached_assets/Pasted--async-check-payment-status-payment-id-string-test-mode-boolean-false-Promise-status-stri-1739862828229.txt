@@ -1,0 +1,73 @@
+  async check_payment_status(payment_id: string, test_mode: boolean = false): Promise<{ status: string, pix_qr_code?: string, pix_code?: string }> {
+    try {
+      if (test_mode) {
+        // In test mode, always return completed status
+        console.log("[For4Payments] Test mode: Payment completed");
+        return {
+          status: 'completed',
+          pix_qr_code: 'test_qr_code',
+          pix_code: 'test_pix_code'
+        };
+      }
+
+      // Construct URL with proper query parameters
+      const url = new URL(`${this.API_URL}/transaction.getPayment`);
+      url.searchParams.append('id', payment_id);
+
+      console.log(`[For4Payments] Checking payment status for ID: ${payment_id}`);
+      console.log(`[For4Payments] Request URL: ${url.toString()}`);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
+
+      console.log(`[For4Payments] Payment status check response: ${response.status}`);
+
+      if (response.ok) {
+        const payment_data = await response.json();
+        console.log(`[For4Payments] Payment data:`, payment_data);
+
+        // Map For4Payments status to our application status
+        const status_mapping: Record<string, string> = {
+          'PENDING': 'pending',
+          'PROCESSING': 'pending',
+          'APPROVED': 'completed',
+          'COMPLETED': 'completed',
+          'PAID': 'completed',
+          'EXPIRED': 'failed',
+          'FAILED': 'failed',
+          'CANCELED': 'cancelled',
+          'CANCELLED': 'cancelled'
+        };
+
+        const current_status = payment_data.status || 'PENDING';
+        const mapped_status = status_mapping[current_status] || 'pending';
+
+        console.log(`[For4Payments] Payment ${payment_id} status: ${current_status} -> ${mapped_status}`);
+
+        return {
+          status: mapped_status,
+          pix_qr_code: payment_data.pixQrCode,
+          pix_code: payment_data.pixCode
+        };
+      } else if (response.status === 404) {
+        console.log(`[For4Payments] Payment ${payment_id} not found`);
+        return { status: 'pending' };
+      } else {
+        const error_message = `Failed to fetch payment status (Status: ${response.status})`;
+        console.error(error_message);
+        return { status: 'pending' };
+      }
+
+    } catch (error) {
+      console.error("[For4Payments] Error checking payment status:", error);
+      return { status: 'pending' };
+    }
+  }
+}
+
+export function create_payment_api(): For4PaymentsAPI {
+  const secret_key = process.env.FOR4PAYMENTS_SECRET_KEY || "f954d198-78ce-43ce-9fdb-54f5cf2df4c0";
+  return new For4PaymentsAPI(secret_key);
+}
