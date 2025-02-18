@@ -509,23 +509,33 @@ class For4PaymentsAPI:
 
     def __init__(self, secret_key: str):
         self.secret_key = secret_key
+        logger.info(f"Initializing For4PaymentsAPI with key: {secret_key[:8]}...")
 
     def _get_headers(self) -> Dict[str, str]:
-        return {
-            'Authorization': f'Bearer {self.secret_key}',  # Adicionando 'Bearer' antes da chave
+        headers = {
+            'Authorization': f'Bearer {self.secret_key}',
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
+        logger.info(f"Generated headers: {headers}")
+        return headers
 
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
         try:
+            # Validação e formatação dos dados
+            if not data.get('name') or not data.get('cpf'):
+                raise ValueError("Nome e CPF são obrigatórios")
+
             # Format and validate amount
             amount_in_cents = int(float(data['amount']) * 100)
+
+            # Remove qualquer formatação do CPF
+            cpf = ''.join(filter(str.isdigit, data['cpf']))
 
             payment_data = {
                 "name": data['name'],
                 "email": data['email'],
-                "cpf": ''.join(filter(str.isdigit, data['cpf'])),
+                "cpf": cpf,
                 "phone": data.get('phone', ''),
                 "paymentMethod": "PIX",
                 "amount": amount_in_cents,
@@ -534,11 +544,14 @@ class For4PaymentsAPI:
                     "quantity": 1,
                     "unitPrice": amount_in_cents,
                     "tangible": False
-                }]
+                }],
+                "callbackUrl": "https://seu-site.com/webhook"  # Adiciona URL de callback
             }
 
-            logger.info(f"Headers being sent to API: {self._get_headers()}")
-            logger.info(f"Payment data being sent to API: {payment_data}")
+            logger.info("=== API Request Details ===")
+            logger.info(f"URL: {self.API_URL}/transaction.purchase")
+            logger.info(f"Headers: {self._get_headers()}")
+            logger.info(f"Payload: {payment_data}")
 
             response = requests.post(
                 f"{self.API_URL}/transaction.purchase",
@@ -547,11 +560,14 @@ class For4PaymentsAPI:
                 timeout=30
             )
 
-            logger.info(f"API Response Status: {response.status_code}")
-            logger.info(f"API Response Body: {response.text}")
+            logger.info("=== API Response Details ===")
+            logger.info(f"Status Code: {response.status_code}")
+            logger.info(f"Response Headers: {dict(response.headers)}")
+            logger.info(f"Response Body: {response.text}")
 
             if response.status_code == 200:
                 response_data = response.json()
+                logger.info(f"Successfully created payment: {response_data}")
                 return {
                     'id': response_data.get('id'),
                     'pixCode': response_data.get('pixCode'),
@@ -560,8 +576,9 @@ class For4PaymentsAPI:
                     'status': response_data.get('status', 'pending')
                 }
             else:
-                logger.error(f"Erro na API de pagamento: {response.text}")
-                raise ValueError(f"Erro ao processar pagamento: {response.text}")
+                error_msg = f"Erro na API de pagamento: Status {response.status_code} - {response.text}"
+                logger.error(error_msg)
+                raise ValueError(error_msg)
 
         except Exception as e:
             logger.error(f"Erro ao criar pagamento: {str(e)}")
