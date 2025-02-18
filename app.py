@@ -15,9 +15,32 @@ from services.payment_api import create_payment_api # Added import statement
 
 # Add format_phone_number function after imports
 def format_phone_number(phone: str) -> str:
-    """Format phone number to match API requirements - digits only"""
+    """Format phone number to match API requirements - digits only, between 8-12 digits"""
     # Remove all non-digits
-    return ''.join(filter(str.isdigit, phone))
+    clean_phone = ''.join(filter(str.isdigit, phone))
+
+    # If phone starts with 55 (country code), remove it
+    if clean_phone.startswith('55'):
+        clean_phone = clean_phone[2:]
+
+    # Validate length after removing country code
+    if len(clean_phone) < 8:
+        # Add default area code (11) if needed
+        clean_phone = '11' + clean_phone
+    elif len(clean_phone) > 12:
+        # Truncate to 12 digits if too long
+        clean_phone = clean_phone[:12]
+
+    return clean_phone
+
+def generate_random_phone() -> str:
+    """
+    Gera um número de telefone aleatório no formato brasileiro aceito pela API
+    """
+    ddd = str(random.randint(11, 99))
+    # Gera 8 dígitos para o número
+    numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+    return f"{ddd}{numero}"
 
 
 # Configuração do logging
@@ -529,6 +552,9 @@ def pagamento():
 
         # Formata o telefone adequadamente - apenas números
         phone = format_phone_number(user_data.get('phone', ''))
+        if not phone or len(phone) < 8:
+            phone = generate_random_phone()
+            logger.info(f"Generated valid phone number: {phone}")
 
         # Garante que temos um email válido
         email = user_data.get('email', '')

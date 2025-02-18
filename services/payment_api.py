@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class For4PaymentsAPI:
 
     def __init__(self, secret_key: str = None):
-        self.API_URL = "https://app.for4payments.com.br/api"  # Fixed base URL
+        self.API_URL = "https://app.for4payments.com.br/api/v1"  # Fixed base URL
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
@@ -28,7 +28,8 @@ class For4PaymentsAPI:
         """Get headers with proper authorization"""
         return {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': self.secret_key
         }
 
     def _format_phone(self, phone: str) -> str:
@@ -49,11 +50,16 @@ class For4PaymentsAPI:
     def _log_request_response(self, transaction_id: str, method: str, url: str, 
                             headers: Dict, request_data: Dict, response: requests.Response):
         """Log detailed request and response information"""
+        # Mask sensitive information in headers
+        safe_headers = {**headers}
+        if 'Authorization' in safe_headers:
+            safe_headers['Authorization'] = f"{safe_headers['Authorization'][:8]}..."
+
         logger.info(f"\n{'='*80}\n[For4Payments][{transaction_id}] REQUEST DETAILS\n{'='*80}")
         logger.info(f"Method: {method}")
         logger.info(f"URL: {url}")
         logger.info("Headers:")
-        logger.info(pprint.pformat(dict(headers), indent=2))
+        logger.info(pprint.pformat(safe_headers, indent=2))
 
         # Log request body with sensitive data masked
         safe_request = {
@@ -117,12 +123,11 @@ class For4PaymentsAPI:
             logger.info(f"Request headers: {headers}")
             logger.info(f"Request data: {payment_data}")
 
-            # Make the request with token as query parameter
+            # Make the request with authorization in header
             response = requests.post(
                 url,
                 headers=headers,
-                json=payment_data,
-                params={'token': self.secret_key}  # Add token as query parameter
+                json=payment_data
             )
 
             # Log complete request and response details
@@ -163,10 +168,7 @@ class For4PaymentsAPI:
             response = requests.get(
                 url, 
                 headers=headers, 
-                params={
-                    'id': payment_id,
-                    'token': self.secret_key
-                }
+                params={'id': payment_id}
             )
 
             # Log complete request and response details
