@@ -28,7 +28,8 @@ class For4PaymentsAPI:
         """Get headers with proper authorization"""
         return {
             'Accept': 'application/json',
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': f'Bearer {self.secret_key}'
         }
 
     def _format_phone(self, phone: str) -> str:

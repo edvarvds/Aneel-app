@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANEEL - Pagamento</title>
+    <title>Gov.br - Pagamento</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -15,52 +15,16 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 
     <style>
-        :root {
-            --focus-color: #C6D1EB;
-            --active-color: #1351B4;
-            --text-color: #1B1B1B;
-            --background-color: #F8F8F8;
-            --button-green: #1B8138;
-            --button-green-dark: #146C2E;
-        }
-
         body {
             font-family: 'rawline', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-color: var(--background-color);
-            color: var(--text-color);
         }
-
         .animate-spin {
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-
-        .gov-button {
-            background-color: var(--button-green);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.25rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-
-        .gov-button:hover {
-            background-color: var(--button-green-dark);
-        }
-
-        .gov-header {
-            background-color: var(--active-color);
-            color: white;
-        }
-
-        .gov-footer {
-            background-color: var(--active-color);
-            color: white;
         }
     </style>
     <script>
@@ -68,9 +32,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'gov-blue': '#1351B4',
-                        'gov-yellow': '#FFCD07',
-                        'gov-green': '#1B8138',
+                        'gov-blue': '#003399',
                     }
                 }
             }
@@ -116,20 +78,34 @@
         }
     </script>
 </head>
-<body class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <div class="gov-header">
-        <div class="container mx-auto px-4 py-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-8">
-                    <img src="https://www.gov.br/logo-gov.png" alt="Governo Federal" class="h-8" />
-                    <img src="https://www.gov.br/aneel/pt-br/theme/gov_br_aneel_theme/img/logo-aneel.png" alt="ANEEL" class="h-8" />
-                </div>
-                <div class="text-right">
-                    <p class="text-sm font-medium">Agência Nacional de Energia Elétrica</p>
-                    <p class="text-xs">Governo Federal</p>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header Branco com Logo Gov.br -->
+    <div class="bg-white py-4 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center text-center">
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
+                <div>
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
+                    </p>
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
+                    </p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
+        <div class="container mx-auto px-4 flex items-center">
+            <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+            </div>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">PAGAMENTO</span>
         </div>
     </div>
 
@@ -137,14 +113,9 @@
     <div class="container mx-auto px-4 py-8 flex-grow">
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gov-blue mb-2">Pagamento</h1>
-                    <p class="text-gray-600">Sistema de Pagamento - ANEEL</p>
-                </div>
-
                 {% if pix_data and pix_data.get('pixQrCode') %}
                     <!-- Status do Pagamento com Loader -->
-                    <div class="bg-gray-50 p-6 rounded-lg w-full mb-6 border border-gray-200">
+                    <div class="bg-gray-50 p-6 rounded-lg w-full mb-6">
                         <div class="flex flex-col items-center">
                             <div class="mb-3">
                                 <svg class="animate-spin h-12 w-12 text-gov-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -162,7 +133,7 @@
                                 <p class="text-sm text-gray-600">Código PIX:</p>
                                 <input type="text" value="{{ pix_data.pixCode }}" readonly
                                        class="w-full py-2.5 px-3 border rounded bg-gray-50 text-gray-700 text-sm" id="pixCode" />
-                                <button onclick="copyPixCode()" class="gov-button w-full flex items-center justify-center">
+                                <button onclick="copyPixCode()" class="w-full bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md transition duration-200">
                                     <i class="fas fa-copy mr-2"></i>
                                     <span>Copiar Código PIX</span>
                                 </button>
@@ -197,7 +168,7 @@
                         {% else %}
                             <p>Erro ao gerar o QR Code PIX. Por favor, tente novamente.</p>
                         {% endif %}
-                        <a href="/" class="gov-button inline-block mt-4">
+                        <a href="/" class="mt-4 inline-block bg-gov-blue text-white px-6 py-2 rounded-lg hover:bg-opacity-90">
                             Voltar ao início
                         </a>
                     </div>
@@ -207,19 +178,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="gov-footer py-4">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="text-center md:text-left mb-4 md:mb-0">
-                    <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica</p>
-                    <p class="text-sm mt-1">Todos os direitos reservados</p>
-                </div>
-                <div class="text-center md:text-right">
-                    <p class="text-sm">Central de Atendimento: 167</p>
-                    <p class="text-sm mt-1">www.gov.br/aneel</p>
-                </div>
-            </div>
-        </div>
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
 
     <script>
