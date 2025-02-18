@@ -512,7 +512,7 @@ class For4PaymentsAPI:
 
     def _get_headers(self) -> Dict[str, str]:
         return {
-            'Authorization': self.secret_key,
+            'Authorization': f'Bearer {self.secret_key}',  # Adicionando 'Bearer' antes da chave
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -537,12 +537,18 @@ class For4PaymentsAPI:
                 }]
             }
 
+            logger.info(f"Headers being sent to API: {self._get_headers()}")
+            logger.info(f"Payment data being sent to API: {payment_data}")
+
             response = requests.post(
                 f"{self.API_URL}/transaction.purchase",
                 json=payment_data,
                 headers=self._get_headers(),
                 timeout=30
             )
+
+            logger.info(f"API Response Status: {response.status_code}")
+            logger.info(f"API Response Body: {response.text}")
 
             if response.status_code == 200:
                 response_data = response.json()
@@ -555,7 +561,7 @@ class For4PaymentsAPI:
                 }
             else:
                 logger.error(f"Erro na API de pagamento: {response.text}")
-                raise ValueError("Erro ao processar pagamento")
+                raise ValueError(f"Erro ao processar pagamento: {response.text}")
 
         except Exception as e:
             logger.error(f"Erro ao criar pagamento: {str(e)}")
