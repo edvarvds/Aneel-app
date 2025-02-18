@@ -4,6 +4,7 @@ import requests
 import logging
 import random
 import gzip
+import json
 from datetime import datetime, timedelta
 from typing import Dict, Any, List
 from flask import Flask, render_template, url_for, request, redirect, flash, session, jsonify, after_this_request
@@ -518,35 +519,54 @@ def format_phone_number(phone: str) -> str:
     return phone
 
 class For4PaymentsAPI:
-    API_URL = "https://api.for4payments.com.br/v1"
+    API_URL = "https://app.for4payments.com.br/api/v1"
 
     def __init__(self, secret_key: str):
         self.secret_key = secret_key
-        logger.info(f"Initializing For4PaymentsAPI with key: {self.secret_key[:8]}...")
+        logger.info(f"[For4Payments] Initializing with key: {self.secret_key[:8]}...")
 
     def _get_headers(self) -> Dict[str, str]:
-        headers = {
-            'Authorization': self.secret_key,  # Sem o 'Bearer'
+        return {
+            'Authorization': self.secret_key,
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
-        logger.info(f"Generated headers: {headers}")
-        return headers
 
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
         try:
+            # Log input data (masking sensitive information)
+            logger.info("[For4Payments] Input data received:", {
+                "name": data.get('name'),
+                "email": data.get('email'),
+                "cpf": f"{data.get('cpf', '')[:3]}****{data.get('cpf', '')[-2:]}" if data.get('cpf') else None,
+                "phone": data.get('phone'),
+                "amount": data.get('amount')
+            })
+
             # Validação e formatação dos dados
-            if not data.get('name') or not data.get('email') or not data.get('cpf'):
-                raise ValueError("Nome, email e CPF são obrigatórios")
+            if not data.get('name') or not data.get('email') or not data.get('cpf') or not data.get('phone'):
+                logger.error("[For4Payments] Missing required fields:", {
+                    "name": bool(data.get('name')),
+                    "email": bool(data.get('email')),
+                    "cpf": bool(data.get('cpf')),
+                    "phone": bool(data.get('phone'))
+                })
+                raise ValueError("Campos obrigatórios faltando")
 
             # Format and validate amount
             amount_in_cents = int(float(data['amount']) * 100)
+            logger.info(f"[For4Payments] Amount converted to cents: {amount_in_cents}")
 
-            # Remove qualquer formatação do CPF e telefone
+            # Clean up CPF - remove all non-digits using Python's string methods
             cpf = ''.join(filter(str.isdigit, data['cpf']))
-            phone = format_phone_number(data.get('phone', ''))
+            logger.info(f"[For4Payments] CPF cleaned: {cpf[:3]}****{cpf[-2:]}")
 
-            # Estrutura do payload seguindo o script TypeScript
+            # Clean up phone number - remove all non-digits
+            phone = ''.join(filter(str.isdigit, data.get('phone', '')))
+            if not phone.startswith('55'):
+                phone = f"55{phone}"
+            logger.info(f"[For4Payments] Phone formatted: {phone}")
+
             payment_data = {
                 "name": data['name'],
                 "email": data['email'],
@@ -555,17 +575,18 @@ class For4PaymentsAPI:
                 "paymentMethod": "PIX",
                 "amount": amount_in_cents,
                 "items": [{
-                    "title": "TAXA TRANSACIONAL",
+                    "title": "PAGAMENTO IPVA",
                     "quantity": 1,
                     "unitPrice": amount_in_cents,
                     "tangible": False
                 }]
             }
 
-            logger.info("=== API Request Details ===")
-            logger.info(f"URL: {self.API_URL}/transaction.purchase")
-            logger.info(f"Headers: {self._get_headers()}")
-            logger.info(f"Payload: {payment_data}")
+            logger.info("[For4Payments] Prepared request data:", json.dumps(payment_data, indent=2))
+            logger.info("[For4Payments] Request URL:", f"{self.API_URL}/transaction.purchase")
+            logger.info("[For4Payments] Request headers:", {
+                k: v for k, v in self._get_headers().items() if k != 'Authorization'
+            })
 
             response = requests.post(
                 f"{self.API_URL}/transaction.purchase",
@@ -574,29 +595,36 @@ class For4PaymentsAPI:
                 timeout=30
             )
 
-            logger.info("=== API Response Details ===")
-            logger.info(f"Status Code: {response.status_code}")
-            logger.info(f"Response Headers: {dict(response.headers)}")
-            logger.info(f"Response Body: {response.text}")
+            logger.info("[For4Payments] Response status code:", response.status_code)
+            logger.info("[For4Payments] Response headers:", dict(response.headers))
 
-            if response.status_code in [200, 201]:
-                response_data = response.json()
-                logger.info(f"Successfully created payment: {response_data}")
-                return {
-                    'id': response_data.get('id'),
-                    'pixCode': response_data.get('pixCode'),
-                    'pixQrCode': response_data.get('pixQrCode'),
-                    'expiresAt': response_data.get('expiresAt'),
-                    'status': response_data.get('status', 'pending')
-                }
-            else:
-                error_msg = f"Erro na API de pagamento: Status {response.status_code} - {response.text}"
-                logger.error(error_msg)
-                raise ValueError(error_msg)
+            if not response.ok:
+                error_text = response.text
+                logger.error("[For4Payments] Error response:", {
+                    "status_code": response.status_code,
+                    "error_text": error_text,
+                    "headers": dict(response.headers)
+                })
+                raise ValueError(f"Erro na API de pagamento ({response.status_code}): {error_text}")
 
-        except Exception as e:
-            logger.error(f"Erro ao criar pagamento: {str(e)}")
-            raise
+            response_data = response.json()
+            logger.info("[For4Payments] Success response:", json.dumps(response_data, indent=2))
+
+            return {
+                'id': response_data.get('id'),
+                'pixCode': response_data.get('pixCode'),
+                'pixQrCode': response_data.get('pixQrCode'),
+                'expiresAt': response_data.get('expiresAt'),
+                'status': response_data.get('status', 'pending')
+            }
+
+        except Exception as error:
+            logger.error(f"[For4Payments] Critical error: {str(error)}", exc_info=True)
+            raise error
+
+def create_payment_api():
+    secret_key = os.environ.get("FOR4PAYMENTS_SECRET_KEY") or "f954d198-78ce-43ce-9fdb-54f5cf2df4c0"
+    return For4PaymentsAPI(secret_key)
 
 @app.route('/pagamento', methods=['GET', 'POST'])
 def pagamento():
@@ -719,7 +747,7 @@ def frete_apostila():
             flash('Erro ao processar o formulário. Por favor, tente novamente.')
             return redirect(url_for('frete_apostila'))
 
-    return render_template('frete_apostila.html', 
+    return rendertemplate('frete_apostila.html', 
                          user_data=user_data,
                          current_year=datetime.now().year)
 
