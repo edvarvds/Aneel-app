@@ -29,7 +29,7 @@ class For4PaymentsAPI:
         return {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': f'{self.secret_key}'
+             'Authorization': f'{self.secret_key}'
         }
 
     def _format_phone(self, phone: str) -> str:
@@ -182,29 +182,21 @@ class For4PaymentsAPI:
 
             if response.status_code == 200:
                 result = response.json()
-                status = result.get('status', 'PENDING').lower()
-
-                # Map API status to our status
-                if status in ['paid', 'completed', 'approved']:
-                    return {'status': 'completed'}
-                elif status in ['cancelled', 'failed', 'refused']:
-                    return {'status': 'failed'}
-                else:
-                    return {
-                        'status': 'pending',
-                        'pixQrCode': result.get('pixQrCode'),
-                        'pixCode': result.get('pixCode')
-                    }
+                return {
+                    'status': result.get('status', 'PENDING'),
+                    'pixQrCode': result.get('pixQrCode'),
+                    'pixCode': result.get('pixCode')
+                }
             elif response.status_code == 404:
                 logger.warning(f"[For4Payments][{transaction_id}] Payment {payment_id} not found")
-                return {'status': 'pending'}
+                return {'status': 'PENDING'}
             else:
                 logger.error(f"[For4Payments][{transaction_id}] Error checking payment status: {response.text}")
-                return {'status': 'pending'}
+                return {'status': 'PENDING'}
 
         except Exception as e:
             logger.error(f"[For4Payments][{transaction_id}] Error checking payment status: {str(e)}")
-            return {'status': 'pending'}
+            return {'status': 'PENDING'}
 
 
 def create_payment_api() -> For4PaymentsAPI:
