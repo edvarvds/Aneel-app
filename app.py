@@ -127,6 +127,45 @@ ESTADOS = {
     'Tocantins': 'TO'
 }
 
+# Adiciona dicionário de companhias elétricas por estado
+COMPANHIAS_ELETRICAS = {
+    'AC': [{'id': 'energisa_ac', 'nome': 'Energisa Acre'}],
+    'AL': [{'id': 'equatorial_al', 'nome': 'Equatorial Alagoas'}],
+    'AM': [{'id': 'amazonas_energia', 'nome': 'Amazonas Energia'}],
+    'AP': [{'id': 'cea', 'nome': 'Companhia de Eletricidade do Amapá'}],
+    'BA': [{'id': 'neoenergia_ba', 'nome': 'Neoenergia Coelba'}],
+    'CE': [{'id': 'enel_ce', 'nome': 'Enel Ceará'}],
+    'DF': [{'id': 'neoenergia_df', 'nome': 'Neoenergia Distribuição Brasília'}],
+    'ES': [{'id': 'edp_es', 'nome': 'EDP Espírito Santo'}],
+    'GO': [{'id': 'enel_go', 'nome': 'Enel Goiás'}],
+    'MA': [{'id': 'equatorial_ma', 'nome': 'Equatorial Maranhão'}],
+    'MT': [{'id': 'energisa_mt', 'nome': 'Energisa Mato Grosso'}],
+    'MS': [{'id': 'energisa_ms', 'nome': 'Energisa Mato Grosso do Sul'}],
+    'MG': [{'id': 'cemig', 'nome': 'CEMIG Distribuição'}],
+    'PA': [{'id': 'equatorial_pa', 'nome': 'Equatorial Pará'}],
+    'PB': [{'id': 'energisa_pb', 'nome': 'Energisa Paraíba'}],
+    'PR': [{'id': 'copel', 'nome': 'COPEL Distribuição'}],
+    'PE': [{'id': 'neoenergia_pe', 'nome': 'Neoenergia Pernambuco (CELPE)'}],
+    'PI': [{'id': 'equatorial_pi', 'nome': 'Equatorial Piauí'}],
+    'RJ': [
+        {'id': 'light', 'nome': 'Light'},
+        {'id': 'enel_rj', 'nome': 'Enel Rio'}
+    ],
+    'RN': [{'id': 'neoenergia_rn', 'nome': 'Neoenergia Cosern'}],
+    'RS': [{'id': 'rge_sul', 'nome': 'RGE Sul'}],
+    'RO': [{'id': 'energisa_ro', 'nome': 'Energisa Rondônia'}],
+    'RR': [{'id': 'roraima_energia', 'nome': 'Roraima Energia'}],
+    'SC': [{'id': 'celesc', 'nome': 'CELESC Distribuição'}],
+    'SP': [
+        {'id': 'enel_sp', 'nome': 'Enel São Paulo'},
+        {'id': 'cpfl_paulista', 'nome': 'CPFL Paulista'},
+        {'id': 'elektro', 'nome': 'Neoenergia Elektro'},
+        {'id': 'edp_sp', 'nome': 'EDP São Paulo'}
+    ],
+    'SE': [{'id': 'energisa_se', 'nome': 'Energisa Sergipe'}],
+    'TO': [{'id': 'energisa_to', 'nome': 'Energisa Tocantins'}]
+}
+
 def get_estado_from_ip(ip_address: str) -> str:
     """
     Obtém o estado baseado no IP do usuário usando um serviço de geolocalização
@@ -269,11 +308,52 @@ def verificar_data():
 
     # Obtém o estado baseado no IP do usuário
     ip_address = get_client_ip()
-    estado_atual = get_estado_from_ip(ip_address)
+    estado_detectado = get_estado_from_ip(ip_address)
+    logger.info(f"Estado detectado para IP {ip_address}: {estado_detectado}")
 
-    return render_template('selecionar_estado.html', 
-                         estado_atual=estado_atual,
+    return render_template('confirmar_dados.html',
+                         estado_detectado=estado_detectado,
+                         companhias=COMPANHIAS_ELETRICAS.get(estado_detectado[:2], []),
                          current_year=datetime.now().year)
+
+@app.route('/api/companhias/<estado>')
+def get_companhias(estado):
+    """Retorna a lista de companhias elétricas para um estado específico"""
+    companhias = COMPANHIAS_ELETRICAS.get(estado.upper(), [])
+    return jsonify(companhias)
+
+@app.route('/confirmar_dados', methods=['POST'])
+def confirmar_dados():
+    estado = request.form.get('estado')
+    companhia_id = request.form.get('companhia')
+    dados_usuario = session.get('dados_usuario')
+
+    if not dados_usuario or not estado or not companhia_id:
+        flash('Sessão expirada ou dados incompletos. Por favor, tente novamente.')
+        return redirect(url_for('index'))
+
+    # Encontra o nome da companhia selecionada
+    companhias = COMPANHIAS_ELETRICAS.get(estado, [])
+    companhia_nome = next((c['nome'] for c in companhias if c['id'] == companhia_id), None)
+
+    if not companhia_nome:
+        flash('Companhia elétrica inválida. Por favor, tente novamente.')
+        return render_template('confirmar_dados.html',
+                            estado_detectado=estado,
+                            companhias=companhias,
+                            current_year=datetime.now().year)
+
+    # Salva os dados de localização na sessão
+    dados_usuario['estado'] = estado
+    dados_usuario['companhia'] = {
+        'id': companhia_id,
+        'nome': companhia_nome
+    }
+    session['dados_usuario'] = dados_usuario
+
+    # Redireciona para a próxima etapa
+    return redirect(url_for('pagamento'))
+
 
 @app.route('/selecionar_estado', methods=['POST'])
 def selecionar_estado():

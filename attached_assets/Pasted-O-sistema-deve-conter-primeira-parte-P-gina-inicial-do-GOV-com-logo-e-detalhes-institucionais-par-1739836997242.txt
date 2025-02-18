@@ -1,0 +1,39 @@
+O sistema deve conter:
+
+primeira parte: Página inicial do GOV com logo e detalhes institucionais para logar
+
+segunda parte:  Espaço para adicionar o CPF e efetuar uma busca. 
+
+terceira parte: Etapa 1 - Validação de nome (que já tem nesse sistema)
+
+quarta parte: Etapa 2 - Validação de data de nascimento (que já tem nesse sistema)
+
+quinta parte:  Deve conter duas questões de confirmação na mesma página. (Similar a que ja tem no sistema)
+
+1ª - Seleciondor de estado: deve conter um capturador de IP para identificar automaticamente qual o estado que a pessoa está e já deixar pre-selecionado
+
+2ª - Selecione sua companhia elétrica: deve conter todas companhias eletricas de cada estado do brasil para a pessoa selecionar a dele. 
+
+sexta parte: deve conter um scrol de carregamento institucional analisando se a aprovação desse individuo que chegou até essa parte do funil está aprovada ou não...
+
+Setima parte: Após 5 segundos de analise vai mostrar todos os dados colhidos, incluido o que foi pego na API junto com o estado e a empresa de energia que foi selecionada. 
+
+Continuando nessa página vai mostrar informações sendo buscadas ao vivo como por exemplo: 
+
+- Consultando a Agência Nacional de Energia Elétrica (ANEEL)
+
+- Conferindo se teve cobranças indevidas nos dados da Receita Federal 
+
+pense em coisas mais reais e contextuais para parecer real e mais profissional...
+
+E por fim nessa mesma página coloque que foi aprovada uma restituição no CPF x no valor de 3.769,00 reais e um botão pra sacar. 
+
+oitava página: Após isso coloque a opção de efetuar a retirada do valor pelo pix obrigatório do CPF e com o beneficiário correto que foi colhido na api. 
+
+nona página: Após solicitar o retirada coloque um carregamento mostrando que a transferencia está sendo feita... porem antes de concluir o carregamento coloque que deu um erro na cobrança. O erro é Pagamento da tarifa transacional pendente. 
+
+Regularize o pagamento da tarifa transacional para poder finalizar a retirada da sua restituição. 
+
+Tarifa transacional no valor de 78,40. Efetuar pagamento e ir para o checkout que já está nessa estrutura e poderá ser aproveitado
+
+Faça tudo sem faltar nada ou bugar, faça um tipo de logica para seguir e fazer tudo funcionar perfeitamente

