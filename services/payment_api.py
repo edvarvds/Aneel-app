@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class For4PaymentsAPI:
 
     def __init__(self, secret_key: str = None):
-        self.API_URL = "https://app.for4payments.com.br/api/v1/"  # Fixed: Added trailing slash
+        self.API_URL = "https://app.for4payments.com.br/api/v1/"  # Fixed URL with v1
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
@@ -25,8 +25,9 @@ class For4PaymentsAPI:
         logger.info(f"[For4Payments] Initializing with key: {masked_key}")
 
     def _get_headers(self) -> Dict[str, str]:
+        """Get headers with proper authorization"""
         return {
-            'Authorization': f"Bearer {self.secret_key}",  
+            'Authorization': f"Bearer {self.secret_key}",
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -36,11 +37,11 @@ class For4PaymentsAPI:
         # Remove all non-digits
         clean_phone = ''.join(filter(str.isdigit, phone))
 
-        # Ensure it has country code
-        if not clean_phone.startswith('55'):
-            clean_phone = '55' + clean_phone
+        # Remove country code if present
+        if clean_phone.startswith('55'):
+            clean_phone = clean_phone[2:]
 
-        # Validate the phone number format (including country code)
+        # Validate the phone number format
         if not re.match(r'^\d{8,12}$', clean_phone):
             raise ValueError("Phone number must be between 8 and 12 digits")
 
@@ -53,11 +54,8 @@ class For4PaymentsAPI:
         logger.info(f"\n{'='*80}\n[For4Payments][{transaction_id}] REQUEST DETAILS\n{'='*80}")
         logger.info(f"Method: {method}")
         logger.info(f"URL: {url}")
-
-        # Log headers without sensitive data
-        safe_headers = {k: v for k, v in headers.items() if k.lower() != 'authorization'}
         logger.info("Headers:")
-        logger.info(pprint.pformat(safe_headers, indent=2))
+        logger.info(pprint.pformat(dict(headers), indent=2))
 
         # Log request body with sensitive data masked
         safe_request = {
@@ -106,7 +104,7 @@ class For4PaymentsAPI:
                 'name': data['name'],
                 'email': data['email'],
                 'cpf': clean_cpf,
-                'phone': formatted_phone,
+                'phone': formatted_phone,  # Now sending without country code
                 'paymentMethod': 'PIX',
                 'amount': amount_cents,
                 'items': [{
@@ -117,7 +115,7 @@ class For4PaymentsAPI:
                 }]
             }
 
-            url = urljoin(self.API_URL, 'transaction.purchase')
+            url = urljoin(self.API_URL, 'transaction/purchase')  # Fixed endpoint path
             headers = self._get_headers()
 
             # Make the request

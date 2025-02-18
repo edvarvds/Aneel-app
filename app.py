@@ -18,9 +18,9 @@ def format_phone_number(phone: str) -> str:
     """Format phone number to match API requirements"""
     # Remove all non-digits
     clean_phone = ''.join(filter(str.isdigit, phone))
-    # Ensure it has country code
-    if not clean_phone.startswith('55'):
-        clean_phone = '55' + clean_phone
+    # Remove country code if present
+    if clean_phone.startswith('55'):
+        clean_phone = clean_phone[2:]
     return clean_phone
 
 
