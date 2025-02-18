@@ -14,6 +14,9 @@ from flask_migrate import Migrate
 from services.payment_api import create_payment_api # Added import statement
 from services.facebook_pixel import FacebookPixel # Add to imports section
 
+# Add after the imports section
+port = int(os.environ.get("PORT", 5000))
+
 # Add format_phone_number function after imports
 def format_phone_number(phone: str) -> str:
     """Format phone number to match API requirements - digits only, between 8-12 digits"""
@@ -772,7 +775,7 @@ def obrigado():
             'name': user_data.get('nome_real', '')
         }
         purchase_script = facebook_pixel.get_purchase_event_script(
-            value=114.10,  # Value of Correios registration
+            value=114.10,  # Value ofCorreios registration
             currency='BRL',
             content_type='product',
             transaction_id=user_data.get('cpf', ''),  # UsingCPF as transaction ID
@@ -898,4 +901,4 @@ def generate_random_email() -> str:
     return f"{random_string}@temp-mail.org"
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
