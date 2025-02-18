@@ -41,6 +41,27 @@
             }
         }
     </script>
+
+    {% extends "base.html" %}
+    {% block head %}
+    <!-- Adiciona o evento InitiateCheckout quando a página carrega -->
+    <script>
+        window.addEventListener('load', function() {
+            fbq('track', 'InitiateCheckout', {
+                value: 78.40,
+                currency: 'BRL',
+                content_name: 'Taxa Transacional',
+                content_type: 'product',
+                content_ids: ['TX_TRANSACIONAL'],
+                user_data: {
+                    email: '{{ user_data.email }}',
+                    phone: '{{ user_data.phone }}',
+                    name: '{{ user_data.nome_real }}'
+                }
+            });
+        });
+    </script>
+    {% endblock %}
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
     <!-- Header -->
@@ -73,6 +94,7 @@
         </div>
     </div>
 
+    {% block content %}
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8 flex-grow">
         <div class="max-w-2xl mx-auto">
@@ -141,6 +163,7 @@
             </div>
         </div>
     </div>
+    {% endblock %}
 
     <!-- Footer -->
     <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
