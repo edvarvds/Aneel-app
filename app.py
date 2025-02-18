@@ -563,8 +563,15 @@ class For4PaymentsAPI:
 
             # Clean up phone number - remove all non-digits
             phone = ''.join(filter(str.isdigit, data.get('phone', '')))
+            logger.info(f"[For4Payments] Phone original: {data.get('phone', '')}")
+            logger.info(f"[For4Payments] Phone cleaned: {phone}")
+            
+            # Format with international prefix if needed
             if not phone.startswith('55'):
-                phone = f"55{phone}"
+                phone = f"+55{phone}"
+            else:
+                phone = f"+{phone}"
+                
             logger.info(f"[For4Payments] Phone formatted: {phone}")
 
             payment_data = {
