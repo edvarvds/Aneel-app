@@ -179,14 +179,14 @@
             steps.forEach((step, index) => {
                 setTimeout(() => {
                     step.classList.add('show');
-                }, index * 1200); // Show each step with 1.2s delay
+                }, index * 5000); // Show each step with 5s delay
             });
 
-            // After all steps are shown, wait 1 second and show results
+            // After all steps are shown, wait 5 seconds and show results
             setTimeout(() => {
                 document.getElementById('loading-section').style.display = 'none';
                 document.getElementById('results-section').classList.remove('hidden');
-            }, (steps.length * 1200) + 1000);
+            }, (steps.length * 5000) + 5000);
         }
 
         // Start the animation sequence when the page loads

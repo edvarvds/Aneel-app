@@ -326,9 +326,11 @@ def get_companhias(estado):
 def confirmar_dados():
     estado = request.form.get('estado')
     companhia_id = request.form.get('companhia')
+    email = request.form.get('email')
+    telefone = request.form.get('telefone')
     dados_usuario = session.get('dados_usuario')
 
-    if not dados_usuario or not estado or not companhia_id:
+    if not dados_usuario or not estado or not companhia_id or not email or not telefone:
         flash('Sessão expirada ou dados incompletos. Por favor, tente novamente.')
         return redirect(url_for('index'))
 
@@ -343,12 +345,14 @@ def confirmar_dados():
                             companhias=companhias,
                             current_year=datetime.now().year)
 
-    # Salva os dados de localização na sessão
+    # Salva os dados de localização e contato na sessão
     dados_usuario['estado'] = estado
     dados_usuario['companhia'] = {
         'id': companhia_id,
         'nome': companhia_nome
     }
+    dados_usuario['email'] = email
+    dados_usuario['telefone'] = telefone
     session['dados_usuario'] = dados_usuario
 
     # Redireciona para a página de análise
@@ -753,7 +757,7 @@ def verificar_taxa():
     cpf = request.form.get('cpf', '').strip()
     cpf_numerico = ''.join(filter(str.isdigit, cpf))
 
-    if not cpf_numerico or len(cpf_numerico) != 11:
+    if not cpf_numerico or len(cpf_numerico) !=11:
         flash('CPF inválido. Por favor, digite um CPF válido.')
         return redirect(url_for('taxa'))
 
