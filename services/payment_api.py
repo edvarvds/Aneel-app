@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class For4PaymentsAPI:
 
     def __init__(self, secret_key: str = None):
-        self.API_URL = "https://app.for4payments.com.br/api/v1/"  # Fixed URL with v1
+        self.API_URL = "https://app.for4payments.com.br/api/"  # Removed v1 as per error logs
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
@@ -27,9 +27,8 @@ class For4PaymentsAPI:
     def _get_headers(self) -> Dict[str, str]:
         """Get headers with proper authorization"""
         return {
-            'Authorization': f"Bearer {self.secret_key}",
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Accept': 'application/json'
         }
 
     def _format_phone(self, phone: str) -> str:
@@ -50,7 +49,6 @@ class For4PaymentsAPI:
     def _log_request_response(self, transaction_id: str, method: str, url: str, 
                             headers: Dict, request_data: Dict, response: requests.Response):
         """Log detailed request and response information"""
-        # Log Request
         logger.info(f"\n{'='*80}\n[For4Payments][{transaction_id}] REQUEST DETAILS\n{'='*80}")
         logger.info(f"Method: {method}")
         logger.info(f"URL: {url}")
@@ -66,7 +64,6 @@ class For4PaymentsAPI:
         logger.info("Request Body:")
         logger.info(pprint.pformat(safe_request, indent=2))
 
-        # Log Response
         logger.info(f"\n{'='*80}\n[For4Payments][{transaction_id}] RESPONSE DETAILS\n{'='*80}")
         logger.info(f"Status Code: {response.status_code}")
         logger.info("Response Headers:")
@@ -83,8 +80,6 @@ class For4PaymentsAPI:
                 logger.info(pprint.pformat(response_body, indent=2))
         except Exception as e:
             logger.error(f"Error processing response: {str(e)}")
-
-        logger.info(f"{'='*80}\n")
 
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
         transaction_id = str(uuid.uuid4())
@@ -104,7 +99,7 @@ class For4PaymentsAPI:
                 'name': data['name'],
                 'email': data['email'],
                 'cpf': clean_cpf,
-                'phone': formatted_phone,  # Now sending without country code
+                'phone': formatted_phone,
                 'paymentMethod': 'PIX',
                 'amount': amount_cents,
                 'items': [{
@@ -115,11 +110,16 @@ class For4PaymentsAPI:
                 }]
             }
 
-            url = urljoin(self.API_URL, 'transaction/purchase')  # Fixed endpoint path
+            url = urljoin(self.API_URL, 'transaction.purchase')  # Changed back to dot notation
             headers = self._get_headers()
 
             # Make the request
-            response = requests.post(url, headers=headers, json=payment_data)
+            response = requests.post(
+                url,
+                headers=headers,
+                json=payment_data,
+                params={'token': self.secret_key}  # Added token as query parameter
+            )
 
             # Log complete request and response details
             self._log_request_response(
