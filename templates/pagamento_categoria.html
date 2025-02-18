@@ -194,12 +194,11 @@
             }, 2000);
         }
 
-        // Verificar status do pagamento a cada 1 segundo
         async function checkPaymentStatus() {
             try {
                 const response = await fetch('/check_payment/{{ pix_data.id }}');
                 const data = await response.json();
-                console.log('Payment status response:', data); // Added logging
+                console.log('Payment status response:', data);
 
                 if (data.status === 'COMPLETED' || data.status === 'APPROVED' || data.status === 'PAID') {
                     // Atualizar interface para mostrar sucesso
@@ -207,8 +206,8 @@
                     document.querySelector('svg').style.display = 'none';
                     document.querySelector('h2').textContent = 'Pagamento Confirmado!';
 
-                    // Redirecionar instantaneamente
-                    window.location.href = '/obrigado';
+                    // Redirecionar para a página de confirmação
+                    window.location.href = '/confirmacao_pagamento/{{ pix_data.id }}';
                     return;
                 } else if (data.status === 'FAILED' || data.status === 'CANCELLED' || data.status === 'REJECTED' || data.status === 'ERROR') {
                     document.querySelector('.animate-spin').classList.remove('animate-spin');

