@@ -508,6 +508,7 @@ def verificar_endereco():
 def format_phone_number(phone: str) -> str:
     """
     Formata o número de telefone para o padrão aceito pela API
+    Remove todos os caracteres não numéricos e garante que começa com 55
     """
     # Remove todos os caracteres não numéricos
     phone = ''.join(filter(str.isdigit, phone))
@@ -516,6 +517,7 @@ def format_phone_number(phone: str) -> str:
     if not phone.startswith('55'):
         phone = f"55{phone}"
 
+    logger.info(f"[Phone Formatting] Original: {phone} -> Formatted: {phone}")
     return phone
 
 class For4PaymentsAPI:
@@ -561,17 +563,8 @@ class For4PaymentsAPI:
             cpf = ''.join(filter(str.isdigit, data['cpf']))
             logger.info(f"[For4Payments] CPF cleaned: {cpf[:3]}****{cpf[-2:]}")
 
-            # Clean up phone number - remove all non-digits
-            phone = ''.join(filter(str.isdigit, data.get('phone', '')))
-            logger.info(f"[For4Payments] Phone original: {data.get('phone', '')}")
-            logger.info(f"[For4Payments] Phone cleaned: {phone}")
-            
-            # Format with international prefix if needed
-            if not phone.startswith('55'):
-                phone = f"+55{phone}"
-            else:
-                phone = f"+{phone}"
-                
+            # Clean up phone number - remove all non-digits and format
+            phone = format_phone_number(data.get('phone', ''))
             logger.info(f"[For4Payments] Phone formatted: {phone}")
 
             payment_data = {
@@ -754,7 +747,7 @@ def frete_apostila():
             flash('Erro ao processar o formulário. Por favor, tente novamente.')
             return redirect(url_for('frete_apostila'))
 
-    return rendertemplate('frete_apostila.html', 
+    return render_template('frete_apostila.html', 
                          user_data=user_data,
                          current_year=datetime.now().year)
 
