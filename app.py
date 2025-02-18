@@ -15,13 +15,9 @@ from services.payment_api import create_payment_api # Added import statement
 
 # Add format_phone_number function after imports
 def format_phone_number(phone: str) -> str:
-    """Format phone number to match API requirements"""
+    """Format phone number to match API requirements - digits only"""
     # Remove all non-digits
-    clean_phone = ''.join(filter(str.isdigit, phone))
-    # Remove country code if present
-    if clean_phone.startswith('55'):
-        clean_phone = clean_phone[2:]
-    return clean_phone
+    return ''.join(filter(str.isdigit, phone))
 
 
 # Configuração do logging
@@ -531,7 +527,7 @@ def pagamento():
 
         payment_api = create_payment_api()
 
-        # Formata o telefone adequadamente
+        # Formata o telefone adequadamente - apenas números
         phone = format_phone_number(user_data.get('phone', ''))
 
         # Garante que temos um email válido
