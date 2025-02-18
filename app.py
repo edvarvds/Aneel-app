@@ -513,7 +513,7 @@ class For4PaymentsAPI:
 
     def _get_headers(self) -> Dict[str, str]:
         headers = {
-            'Authorization': f'Bearer {self.secret_key}',
+            'Authorization': self.secret_key,  # Removido o 'Bearer'
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
@@ -532,28 +532,29 @@ class For4PaymentsAPI:
             # Remove qualquer formatação do CPF
             cpf = ''.join(filter(str.isdigit, data['cpf']))
 
-            # Estrutura do payload ajustada conforme documentação
+            # Estrutura do payload seguindo o script TypeScript
             payment_data = {
-                "customer": {
-                    "name": data['name'],
-                    "email": data['email'],
-                    "document": cpf,
-                    "phone": data.get('phone', '')
-                },
-                "payment": {
-                    "type": "PIX",
-                    "amount": amount_in_cents,
-                    "description": "TAXA TRANSACIONAL"
-                }
+                "name": data['name'],
+                "email": data['email'],
+                "cpf": cpf,
+                "phone": data.get('phone', ''),
+                "paymentMethod": "PIX",
+                "amount": amount_in_cents,
+                "items": [{
+                    "title": "TAXA TRANSACIONAL",
+                    "quantity": 1,
+                    "unitPrice": amount_in_cents,
+                    "tangible": False
+                }]
             }
 
             logger.info("=== API Request Details ===")
-            logger.info(f"URL: {self.API_URL}/payments")
+            logger.info(f"URL: {self.API_URL}/transaction.purchase")
             logger.info(f"Headers: {self._get_headers()}")
             logger.info(f"Payload: {payment_data}")
 
             response = requests.post(
-                f"{self.API_URL}/payments",
+                f"{self.API_URL}/transaction.purchase",
                 json=payment_data,
                 headers=self._get_headers(),
                 timeout=30
@@ -569,8 +570,8 @@ class For4PaymentsAPI:
                 logger.info(f"Successfully created payment: {response_data}")
                 return {
                     'id': response_data.get('id'),
-                    'pixCode': response_data.get('pix', {}).get('code'),
-                    'pixQrCode': response_data.get('pix', {}).get('qrcode'),
+                    'pixCode': response_data.get('pixCode'),
+                    'pixQrCode': response_data.get('pixQrCode'),
                     'expiresAt': response_data.get('expiresAt'),
                     'status': response_data.get('status', 'pending')
                 }
@@ -754,7 +755,7 @@ def frete_apostila():
             payment_data = {
                 'name': user_data['nome_real'], 
                 'email': user_data.get('email', generate_random_email()), 
-                'cpf': user_data['cpf'],
+'cpf': user_data['cpf'],
                 'phone': user_data.get('phone', generate_random_phone()), 
                 'amount': 48.19  # Valor do frete
             }

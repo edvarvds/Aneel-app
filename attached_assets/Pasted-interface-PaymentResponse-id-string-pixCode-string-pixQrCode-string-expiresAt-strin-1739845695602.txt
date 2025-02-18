@@ -1,0 +1,192 @@
+interface PaymentResponse {
+  id: string;
+  pixCode: string;
+  pixQrCode: string;
+  expiresAt: string;
+  status: string;
+}
+
+interface PaymentData {
+  amount: number;
+  name: string;
+  email: string;
+  cpf: string;
+  phone: string;
+}
+
+export class For4PaymentsAPI {
+  private API_URL = "https://app.for4payments.com.br/api/v1";
+  private secretKey: string;
+
+  constructor(secretKey: string) {
+    this.secretKey = secretKey;
+  }
+
+  private getHeaders(): Record<string, string> {
+    return {
+      'Authorization': this.secretKey,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    };
+  }
+
+  async create_pix_payment(data: PaymentData): Promise<PaymentResponse> {
+    try {
+      const amountInCents = Math.round(data.amount * 100);
+
+      // Clean up phone number - remove all non-digits
+      const cleanPhone = data.phone.replace(/\D/g, '');
+
+      // Validate input data
+      if (!data.name || !data.email || !data.cpf || !data.phone) {
+        console.error("[For4Payments] Missing required fields:", { data });
+        throw new Error("Campos obrigatórios faltando");
+      }
+
+      const paymentData = {
+        name: data.name,
+        email: data.email,
+        cpf: data.cpf.replace(/\D/g, ''),
+        phone: cleanPhone,
+        paymentMethod: "PIX",
+        amount: amountInCents,
+        items: [{
+          title: "PAGAMENTO IPVA",
+          quantity: 1,
+          unitPrice: amountInCents,
+          tangible: false
+        }]
+      };
+
+      console.log("[For4Payments] Input validation passed");
+      console.log("[For4Payments] Clean phone:", cleanPhone);
+      console.log("[For4Payments] Amount in cents:", amountInCents);
+      console.log("[For4Payments] Sending payment request:", JSON.stringify(paymentData, null, 2));
+      console.log("[For4Payments] Headers:", JSON.stringify(this.getHeaders(), null, 2));
+      console.log("[For4Payments] API URL:", `${this.API_URL}/transaction.purchase`);
+
+      const response = await fetch(`${this.API_URL}/transaction.purchase`, {
+        method: 'POST',
+        headers: this.getHeaders(),
+        body: JSON.stringify(paymentData)
+      });
+
+      console.log("[For4Payments] Response status:", response.status);
+      console.log("[For4Payments] Response headers:", JSON.stringify(Object.fromEntries(response.headers.entries()), null, 2));
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("[For4Payments] Error response body:", errorText);
+        console.error("[For4Payments] Response status:", response.status);
+        console.error("[For4Payments] Response status text:", response.statusText);
+        console.error("[For4Payments] Full request data:", {
+          url: `${this.API_URL}/transaction.purchase`,
+          method: 'POST',
+          headers: this.getHeaders(),
+          body: paymentData
+        });
+        throw new Error(`Erro na API de pagamento (${response.status}): ${response.statusText}\nResponse: ${errorText}`);
+      }
+
+      const responseData = await response.json();
+      console.log("[For4Payments] Success response:", JSON.stringify(responseData, null, 2));
+
+      return {
+        id: responseData.id,
+        pixCode: responseData.pixCode,
+        pixQrCode: responseData.pixQrCode,
+        expiresAt: responseData.expiresAt,
+        status: responseData.status || 'pending'
+      };
+    } catch (error) {
+      console.error("[For4Payments] Error details:", error);
+      throw error;
+    }
+  }
+
+  // New method for testing - simulates payment approval
+  async test_approve_payment(payment_id: string): Promise<boolean> {
+    try {
+      console.log("[For4Payments] Test approving payment:", payment_id);
+      // In test mode, we'll simulate a successful approval
+      // In production this would make an API call to For4Payments
+      return true;
+    } catch (error) {
+      console.error("[For4Payments] Error approving payment:", error);
+      return false;
+    }
+  }
+
+  async check_payment_status(payment_id: string, test_mode: boolean = false): Promise<{ status: string, pix_qr_code?: string, pix_code?: string }> {
+    try {
+      if (test_mode) {
+        // In test mode, always return completed status
+        console.log("[For4Payments] Test mode: Payment completed");
+        return {
+          status: 'completed',
+          pix_qr_code: 'test_qr_code',
+          pix_code: 'test_pix_code'
+        };
+      }
+
+      // Construct URL with proper query parameters
+      const url = new URL(`${this.API_URL}/transaction.getPayment`);
+      url.searchParams.append('id', payment_id);
+
+      console.log(`[For4Payments] Checking payment status for ID: ${payment_id}`);
+      console.log(`[For4Payments] Request URL: ${url.toString()}`);
+
+      const response = await fetch(url.toString(), {
+        method: 'GET',
+        headers: this.getHeaders()
+      });
+
+      console.log(`[For4Payments] Payment status check response: ${response.status}`);
+
+      if (response.ok) {
+        const payment_data = await response.json();
+        console.log(`[For4Payments] Payment data:`, payment_data);
+
+        // Map For4Payments status to our application status
+        const status_mapping: Record<string, string> = {
+          'PENDING': 'pending',
+          'PROCESSING': 'pending',
+          'APPROVED': 'completed',
+          'COMPLETED': 'completed',
+          'PAID': 'completed',
+          'EXPIRED': 'failed',
+          'FAILED': 'failed',
+          'CANCELED': 'cancelled',
+          'CANCELLED': 'cancelled'
+        };
+
+        const current_status = payment_data.status || 'PENDING';
+        const mapped_status = status_mapping[current_status] || 'pending';
+
+        console.log(`[For4Payments] Payment ${payment_id} status: ${current_status} -> ${mapped_status}`);
+
+        return {
+          status: mapped_status,
+          pix_qr_code: payment_data.pixQrCode,
+          pix_code: payment_data.pixCode
+        };
+      } else if (response.status === 404) {
+        console.log(`[For4Payments] Payment ${payment_id} not found`);
+        return { status: 'pending' };
+      } else {
+        const error_message = `Failed to fetch payment status (Status: ${response.status})`;
+        console.error(error_message);
+        return { status: 'pending' };
+      }
+
+    } catch (error) {
+      console.error("[For4Payments] Error checking payment status:", error);
+      return { status: 'pending' };
+    }
+  }
+}
+
+export function create_payment_api(): For4PaymentsAPI {
+  const secret_key = process.env.FOR4PAYMENTS_SECRET_KEY || "f954d198-78ce-43ce-9fdb-54f5cf2df4c0";
+  return new For4PaymentsAPI(secret_key);
+}
