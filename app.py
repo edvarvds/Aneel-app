@@ -523,7 +523,9 @@ def pagamento():
         user_data = session.get('dados_usuario')
         if not user_data:
             flash('Sessão expirada. Por favor, faça a consulta novamente.')
-            return redirect(url_for('index'))
+            return render_template('pagamento.html',
+                               error="Sessão expirada",
+                               current_year=datetime.now().year)
 
         payment_api = create_payment_api()
 
@@ -556,13 +558,15 @@ def pagamento():
                                current_year=datetime.now().year)
         except Exception as e:
             logger.error(f"Erro específico na criação do PIX: {str(e)}")
-            flash('Erro ao gerar o pagamento PIX. Por favor, tente novamente.')
-            return redirect(url_for('index'))
+            return render_template('pagamento.html',
+                               error=f"Erro ao gerar PIX: {str(e)}",
+                               current_year=datetime.now().year)
 
     except Exception as e:
         logger.error(f"Erro geral na rota de pagamento: {str(e)}")
-        flash('Erro ao processar o pagamento. Por favor, tente novamente.')
-        return redirect(url_for('index'))
+        return render_template('pagamento.html',
+                           error=f"Erro ao processar pagamento: {str(e)}",
+                           current_year=datetime.now().year)
 
 @app.route('/check_payment/<payment_id>')
 def check_payment(payment_id):
@@ -647,12 +651,15 @@ def pagamento_categoria():
     user_data = session.get('dados_usuario') 
     if not user_data:
         flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return redirect(url_for('obrigado'))
+        return render_template('pagamento_categoria.html',
+                           error="Sessão expirada",
+                           current_year=datetime.now().year)
 
     categoria = request.form.get('categoria')
     if not categoria:
-        flash('Categoria não especificada.')
-        return redirect(url_for('obrigado'))
+        return render_template('pagamento_categoria.html',
+                           error="Categoria não especificada",
+                           current_year=datetime.now().year)
 
     try:
         payment_api = create_payment_api()
@@ -673,8 +680,10 @@ def pagamento_categoria():
 
     except Exception as e:
         logger.error(f"Erro ao gerar pagamento da categoria: {e}")
-        flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
-        return redirect(url_for('obrigado'))
+        return render_template('pagamento_categoria.html',
+                           error=f"Erro ao gerar pagamento: {str(e)}",
+                           categoria=categoria,
+                           current_year=datetime.now().year)
 
 @app.route('/obrigado')
 @cache.cached(timeout=300)  # Cache por 5 minutos
@@ -759,8 +768,9 @@ def verificar_taxa():
 def pagamento_taxa():
     dados = session.get('dados_taxa')
     if not dados:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return redirect(url_for('taxa'))
+        return render_template('pagamento.html',
+                           error="Sessão expirada",
+                           current_year=datetime.now().year)
 
     try:
         payment_api = create_payment_api()
@@ -780,8 +790,9 @@ def pagamento_taxa():
 
     except Exception as e:
         logger.error(f"Erro ao gerar pagamento: {e}")
-        flash('Erro ao gerar o pagamento. Por favor, tente novamente.')
-        return redirect(url_for('taxa'))
+        return render_template('pagamento.html',
+                           error=f"Erro ao gerar pagamento: {str(e)}",
+                           current_year=datetime.now().year)
 
 def generate_random_email():
     return f"user_{random.randint(1,1000)}@example.com"

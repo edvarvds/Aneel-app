@@ -84,6 +84,15 @@
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-md mx-auto">
             <div class="bg-white rounded-lg shadow-md p-6">
+                <!-- Error Alert -->
+                {% if error %}
+                <div class="container mx-auto px-4 py-4">
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+                        <p class="font-bold">Erro</p>
+                        <p>{{ error }}</p>
+                    </div>
+                </div>
+                {% endif %}
                 <div class="flex flex-col items-center space-y-4">
                     {% if pix_data.pixQrCode %}
                         <div class="bg-gray-100 p-6 rounded-lg w-full">
