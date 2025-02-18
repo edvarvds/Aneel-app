@@ -16,13 +16,32 @@ class Usuario(db.Model):
 
 class Pagamento(db.Model):
     __tablename__ = 'pagamentos'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuarios.id'), nullable=False)
     valor = db.Column(db.Numeric(10, 2), nullable=False)
     status = db.Column(db.String(50), default='pendente')
     tipo = db.Column(db.String(50))  # 'inscricao', 'taxa', 'frete'
     payment_id = db.Column(db.String(255))  # ID do pagamento no For4Payments
+    pix_code = db.Column(db.String(500))    # Código PIX para pagamento
+    pix_qr_code = db.Column(db.String(500)) # QR Code do PIX em formato string
+    expires_at = db.Column(db.DateTime)      # Data de expiração do PIX
     data_criacao = db.Column(db.DateTime, default=datetime.utcnow)
-    
+
     usuario = db.relationship('Usuario', backref=db.backref('pagamentos', lazy=True))
+
+    STATUS_MAPPING = {
+        'PENDING': 'pendente',
+        'PROCESSING': 'pendente',
+        'APPROVED': 'aprovado',
+        'COMPLETED': 'aprovado',
+        'PAID': 'aprovado',
+        'EXPIRED': 'expirado',
+        'FAILED': 'falhou',
+        'CANCELED': 'cancelado',
+        'CANCELLED': 'cancelado'
+    }
+
+    def update_status_from_api(self, api_status):
+        """Atualiza o status do pagamento baseado na resposta da API"""
+        self.status = self.STATUS_MAPPING.get(api_status.upper(), 'pendente')
