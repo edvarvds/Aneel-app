@@ -11,6 +11,18 @@ from flask import Flask, render_template, url_for, request, redirect, flash, ses
 from flask_caching import Cache
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from services.payment_api import create_payment_api # Added import statement
+
+# Add format_phone_number function after imports
+def format_phone_number(phone: str) -> str:
+    """Format phone number to match API requirements"""
+    # Remove all non-digits
+    clean_phone = ''.join(filter(str.isdigit, phone))
+    # Ensure it has country code
+    if not clean_phone.startswith('55'):
+        clean_phone = '55' + clean_phone
+    return clean_phone
+
 
 # Configuração do logging
 logging.basicConfig(level=logging.DEBUG)
@@ -505,9 +517,6 @@ def verificar_endereco():
                          current_year=datetime.now().year)
 
 
-
-
-
 @app.route('/pagamento', methods=['GET', 'POST'])
 def pagamento():
     try:
@@ -601,8 +610,8 @@ def frete_apostila():
             if not all(endereco.get(campo) for campo in campos_obrigatorios):
                 flash('Por favor, preencha todos os campos obrigatórios.')
                 return render_template('frete_apostila.html', 
-                                    user_data=user_data,
-                                    current_year=datetime.now().year)
+                                   user_data=user_data,
+                                   current_year=datetime.now().year)
 
             # Salva o endereço na sessão
             user_data['endereco'] = endereco
@@ -629,9 +638,9 @@ def frete_apostila():
             flash('Erro ao processar o formulário. Por favor, tente novamente.')
             return redirect(url_for('frete_apostila'))
 
-    return rendertemplate('frete_apostila.html', 
-                         user_data=user_data,
-                         current_year=datetime.now().year)
+    return render_template('frete_apostila.html', 
+                        user_data=user_data,
+                        current_year=datetime.now().year)
 
 @app.route('/pagamento_categoria', methods=['POST'])
 def pagamento_categoria():

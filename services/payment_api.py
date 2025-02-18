@@ -15,7 +15,7 @@ class For4PaymentsAPI:
         self.secret_key = secret_key or os.environ.get('FOR4PAYMENTS_SECRET_KEY')
         if not self.secret_key:
             raise ValueError("For4Payments secret key is required")
-        
+
         # Log initialization with masked key
         masked_key = self.secret_key[:8] + "..." if self.secret_key else "None"
         logger.info(f"[For4Payments] Initializing with key: {masked_key}")
@@ -37,7 +37,7 @@ class For4PaymentsAPI:
     def create_pix_payment(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Create a new PIX payment
-        
+
         Args:
             data (dict): Payment data containing:
                 - amount (float): Payment amount
@@ -48,7 +48,7 @@ class For4PaymentsAPI:
         """
         try:
             logger.info("[For4Payments] Input data received:")
-            
+
             # Convert amount to cents
             amount_cents = int(float(data['amount']) * 100)
             logger.info(f"[For4Payments] Amount converted to cents: {amount_cents}")
@@ -78,7 +78,7 @@ class For4PaymentsAPI:
             }
 
             logger.info(f"[For4Payments] Prepared request data: {json.dumps(payment_data, indent=2)}")
-            
+
             response = requests.post(
                 urljoin(self.API_URL, 'transaction.purchase'),
                 headers=self._get_headers(),
@@ -117,7 +117,7 @@ class For4PaymentsAPI:
             if response.status_code == 200:
                 result = response.json()
                 logger.info(f"[For4Payments] Payment status check response: {json.dumps(result, indent=2)}")
-                
+
                 return {
                     'status': result.get('status', 'PENDING'),
                     'pixQrCode': result.get('pixQrCode'),
@@ -133,3 +133,11 @@ class For4PaymentsAPI:
         except Exception as e:
             logger.error(f"[For4Payments] Error checking payment status: {str(e)}")
             return {'status': 'PENDING'}
+
+def create_payment_api() -> For4PaymentsAPI:
+    """Create and return an instance of For4PaymentsAPI with configuration"""
+    secret_key = os.environ.get('FOR4PAYMENTS_SECRET_KEY')
+    if not secret_key:
+        logger.warning("FOR4PAYMENTS_SECRET_KEY not found in environment, checking if secret needs to be requested")
+        raise ValueError("FOR4PAYMENTS_SECRET_KEY is required")
+    return For4PaymentsAPI(secret_key)
